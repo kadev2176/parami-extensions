@@ -1,0 +1,13 @@
+.pfp-link-badge {
+  display: block;
+  margin-right: -10%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 40%;
+  z-index: 999;
+}
+
+.pfp-link-badge img {
+  width: 100%;
+}

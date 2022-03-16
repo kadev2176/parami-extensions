@@ -64,10 +64,11 @@
           const img = await window.pfp.solve(bin);
 
           try {
-            did = window.pfp.parse(img);
+            const aux = window.pfp.parse(img);
+            did = aux.hex;
 
             // eslint-disable-next-line no-await-in-loop
-            meta = await window.pfp.get(did);
+            meta = await window.pfp.get(aux);
             if (meta) identifiers.set(did, meta);
             else did = '';
           } catch {

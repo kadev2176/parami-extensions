@@ -17,31 +17,17 @@
     {
       "matches": ["*://*.discord.com/*"],
       "css": ["styles/common.css", "styles/discord.css"],
-      "js": [
-        "lib/polkadot-util.js",
-        "lib/polkadot-util-crypto.js",
-        "lib/polkadot-types.js",
-        "lib/polkadot-api.js",
-        "utilities.js",
-        "sites/discord.js"
-      ]
+      "js": ["lib/bs58.js", "utilities.js", "sites/discord.js"]
     },
     {
       "matches": ["*://*.twitter.com/*"],
       "css": ["styles/common.css", "styles/twitter.css"],
-      "js": [
-        "lib/polkadot-util.js",
-        "lib/polkadot-util-crypto.js",
-        "lib/polkadot-types.js",
-        "lib/polkadot-api.js",
-        "utilities.js",
-        "sites/twitter.js"
-      ]
+      "js": ["lib/bs58.js", "utilities.js", "sites/twitter.js"]
     }
   ],
 
   "permissions": [
-    "*://rpc.parami.io/",
+    "*://graph.parami.io/",
     "*://cdn.discordapp.com/",
     "*://*.twitter.com/",
     "*://*.twimg.com/",

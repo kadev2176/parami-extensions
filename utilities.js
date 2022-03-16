@@ -6,8 +6,6 @@
   }
 
   window.pfp = {
-    api: null,
-
     lableName: 'pfp-link-badge',
 
     fetch: async url => {
@@ -92,43 +90,41 @@
         }
       }
 
+      // eslint-disable-next-line no-undef
+      const b58 = bs58.encode(binary);
+
       const hex = binary.reduce(
-        (str, b) => str + b.toString(16).padStart(2, '0'),
+        (s, b) => s + b.toString(16).padStart(2, '0'),
         ''
       );
 
-      return `0x${hex}`;
+      return {
+        b58: `did:ad3:${b58}`,
+        hex: `0x${hex}`,
+      };
     },
 
-    get: async did => {
-      if (!window.pfp.api) {
-        // eslint-disable-next-line no-undef
-        const { ApiPromise, HttpProvider } = polkadotApi;
-        const provider = new HttpProvider('https://rpc.parami.io');
+    get: async aux => {
+      const { b58, hex } = aux;
+      try {
+        const res = await fetch('https://graph.parami.io/', {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            query: `{dids(filter: {id: {equalTo: "${hex}"}}) {nodes {id}}}`,
+          }),
+          method: 'POST',
+        });
+        const json = await res.json();
+        if (json.data.dids.nodes.length === 0) return null;
 
-        window.pfp.api = await ApiPromise.create({ provider });
-      }
-
-      const nftOf = await window.pfp.api.query.nft.preferredNft(did);
-      if (nftOf.isEmpty) {
+        return {
+          url: `https://app.parami.io/${b58}`,
+        };
+      } catch {
         return null;
       }
-
-      const metaOf = await window.pfp.api.query.did.metadata(did);
-      if (metaOf.isEmpty) {
-        return null;
-      }
-
-      const meta = metaOf.toHuman();
-
-      // eslint-disable-next-line no-undef
-      const { base58Encode } = polkadotUtilCrypto;
-      const bs58 = base58Encode(did);
-
-      return {
-        url: `https://app.parami.io/did:ad3:${bs58}`,
-        ...meta,
-      };
     },
   };
 })();

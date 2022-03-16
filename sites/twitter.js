@@ -37,10 +37,12 @@
 
         if (container.querySelector(`.${window.pfp.lableName}`)) continue;
 
-        const url = avatar.src
-          .replace('_200x200', '')
-          .replace('_bigger', '')
-          .replace('_normal', '');
+        const uri = new URL(avatar.src);
+        const ext = uri.pathname.split('.').at(-1);
+        const url = `${uri.origin}${uri.pathname
+          .split('_')
+          .slice(0, -1)
+          .join('_')}.${ext}`;
 
         let did = '';
         let meta = null;

@@ -1,0 +1,6 @@
+li[id^="chat-messages-"] div[class^="contents-"] .pfp-link-badge {
+  right: auto;
+  left: 40px;
+  width: 22px;
+  height: 22px;
+}

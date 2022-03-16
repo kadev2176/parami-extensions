@@ -15,6 +15,18 @@
 
   "content_scripts": [
     {
+      "matches": ["*://*.discord.com/*"],
+      "css": ["styles/common.css", "styles/discord.css"],
+      "js": [
+        "lib/polkadot-util.js",
+        "lib/polkadot-util-crypto.js",
+        "lib/polkadot-types.js",
+        "lib/polkadot-api.js",
+        "utilities.js",
+        "sites/discord.js"
+      ]
+    },
+    {
       "matches": ["*://*.twitter.com/*"],
       "css": ["styles/common.css", "styles/twitter.css"],
       "js": [
@@ -30,6 +42,7 @@
 
   "permissions": [
     "*://rpc.parami.io/",
+    "*://cdn.discordapp.com/",
     "*://*.twitter.com/",
     "*://*.twimg.com/",
     "tabs",

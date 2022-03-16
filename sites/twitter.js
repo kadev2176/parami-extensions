@@ -1,7 +1,12 @@
+/* eslint-disable no-continue */
+
 (() => {
+  const pictures = new Map();
+  const identifiers = new Map();
+
   const wm = new WeakMap();
 
-  const callback = mutations => {
+  const callback = async mutations => {
     for (let i = 0; i < mutations.length; i += 1) {
       const mutation = mutations[i];
 
@@ -11,9 +16,10 @@
 
       if (
         mutation.addedNodes.length === 1 &&
-        mutation.addedNodes[0].className === 'pfp-link-badge'
-      )
+        mutation.addedNodes[0].className === window.pfp.lableName
+      ) {
         return;
+      }
     }
 
     const avatars = document.querySelectorAll('img[src*="profile_images"]');
@@ -25,18 +31,54 @@
 
         const a = avatar.closest('a');
 
-        if (a) {
-          const container = a.parentElement.parentElement;
+        if (!a) continue;
 
-          const span = document.createElement('span');
-          span.className = 'pfp-link-badge';
+        const container = a.parentElement.parentElement;
 
-          const logo = document.createElement('img');
-          logo.src = chrome.runtime.getURL('/images/logo-round-core.svg');
-          span.append(logo);
+        if (container.querySelector(`.${window.pfp.lableName}`)) continue;
 
-          container.prepend(span);
+        const url = avatar.src
+          .replace('_200x200', '')
+          .replace('_bigger', '')
+          .replace('_normal', '');
+
+        let did = '';
+        let meta = null;
+        if (pictures.has(url)) {
+          did = pictures.get(url);
+          meta = identifiers.get(did);
+        } else {
+          // eslint-disable-next-line no-await-in-loop
+          const bin = await window.pfp.fetch(url);
+          // eslint-disable-next-line no-await-in-loop
+          const img = await window.pfp.solve(bin);
+
+          try {
+            did = window.pfp.parse(img);
+
+            // eslint-disable-next-line no-await-in-loop
+            meta = await window.pfp.get(did);
+            if (meta) identifiers.set(did, meta);
+            else did = '';
+          } catch {
+            //
+          }
+
+          pictures.set(url, did);
         }
+
+        if (!did || !meta) continue;
+
+        const span = document.createElement('a');
+        span.href = meta.url;
+        span.target = '_blank';
+        span.className = window.pfp.lableName;
+
+        const logo = document.createElement('img');
+        logo.src = chrome.runtime.getURL('/images/logo-round-core.svg');
+        span.append(logo);
+
+        container.prepend(span);
       }
     }
   };

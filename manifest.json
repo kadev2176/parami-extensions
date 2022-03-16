@@ -17,13 +17,21 @@
     {
       "matches": ["*://*.twitter.com/*"],
       "css": ["styles/common.css", "styles/twitter.css"],
-      "js": ["sites/twitter.js"]
+      "js": [
+        "lib/polkadot-util.js",
+        "lib/polkadot-util-crypto.js",
+        "lib/polkadot-types.js",
+        "lib/polkadot-api.js",
+        "utilities.js",
+        "sites/twitter.js"
+      ]
     }
   ],
 
   "permissions": [
-    "http://twitter.com/",
-    "https://twitter.com/",
+    "*://rpc.parami.io/",
+    "*://*.twitter.com/",
+    "*://*.twimg.com/",
     "tabs",
     "activeTab",
     "storage"

@@ -54,6 +54,20 @@
         "utilities.js",
         "sites/youtube.js"
       ]
+    },
+    {
+      "matches": [
+        "*://*.weibo.com/*"
+      ],
+      "css": [
+        "styles/common.css",
+        "styles/weibo.css"
+      ],
+      "js": [
+        "lib/bs58.js",
+        "utilities.js",
+        "sites/weibo.js"
+      ]
     }
   ],
   "permissions": [
@@ -61,6 +75,8 @@
     "*://cdn.discordapp.com/",
     "*://*.twitter.com/",
     "*://*.twimg.com/",
+    "*://*.ggpht.com/",
+    "*://*.sinaimg.cn/",
     "tabs",
     "activeTab",
     "storage"

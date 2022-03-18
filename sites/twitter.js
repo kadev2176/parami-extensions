@@ -16,7 +16,7 @@
 
       if (
         mutation.addedNodes.length === 1 &&
-        mutation.addedNodes[0].className === window.pfp.lableName
+        mutation.addedNodes[0].className === window.pfp.labelName
       ) {
         return;
       }
@@ -35,7 +35,7 @@
 
         const container = a.parentElement.parentElement;
 
-        if (container.querySelector(`.${window.pfp.lableName}`)) continue;
+        if (container.querySelector(`.${window.pfp.labelName}`)) continue;
 
         const uri = new URL(avatar.src);
         const ext = uri.pathname.split('.').at(-1);
@@ -75,11 +75,13 @@
         const span = document.createElement('a');
         span.href = meta.url;
         span.target = '_blank';
-        span.className = window.pfp.lableName;
+        span.className = window.pfp.labelName;
+        span.style.opacity = 1;
 
         const logo = document.createElement('img');
         logo.src = chrome.runtime.getURL('/images/logo-round-core.svg');
         span.append(logo);
+
 
         container.prepend(span);
       }

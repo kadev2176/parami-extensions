@@ -6,7 +6,7 @@
   }
 
   window.pfp = {
-    lableName: 'pfp-link-badge',
+    labelName: 'pfp-link-badge',
 
     fetch: async url => {
       const res = await fetch(url);

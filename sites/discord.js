@@ -85,6 +85,7 @@
         span.target = '_blank';
         span.className = window.pfp.lableName;
         span.onclick = () => window.open(meta.url, '_blank');
+        span.style.opacity = 1;
 
         const logo = document.createElement('img');
         logo.src = chrome.runtime.getURL('/images/logo-round-core.svg');

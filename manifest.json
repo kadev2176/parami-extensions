@@ -1,31 +1,61 @@
 {
   "manifest_version": 2,
-
   "name": "PFP Link by Parami",
   "version": "1.0",
   "description": "Enable link from your PFP to Parami Protocol",
-
   "icons": {
     "16": "/images/logo-16.png",
     "32": "/images/logo-32.png",
     "48": "/images/logo-48.png",
     "128": "/images/logo-128.png"
   },
-  "web_accessible_resources": ["/images/logo-round-core.svg"],
-
+  "web_accessible_resources": [
+    "/images/logo-round-core.svg"
+  ],
   "content_scripts": [
     {
-      "matches": ["*://*.discord.com/*"],
-      "css": ["styles/common.css", "styles/discord.css"],
-      "js": ["lib/bs58.js", "utilities.js", "sites/discord.js"]
+      "matches": [
+        "*://*.discord.com/*"
+      ],
+      "css": [
+        "styles/common.css",
+        "styles/discord.css"
+      ],
+      "js": [
+        "lib/bs58.js",
+        "utilities.js",
+        "sites/discord.js"
+      ]
     },
     {
-      "matches": ["*://*.twitter.com/*"],
-      "css": ["styles/common.css", "styles/twitter.css"],
-      "js": ["lib/bs58.js", "utilities.js", "sites/twitter.js"]
+      "matches": [
+        "*://*.twitter.com/*"
+      ],
+      "css": [
+        "styles/common.css",
+        "styles/twitter.css"
+      ],
+      "js": [
+        "lib/bs58.js",
+        "utilities.js",
+        "sites/twitter.js"
+      ]
+    },
+    {
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "css": [
+        "styles/common.css",
+        "styles/youtube.css"
+      ],
+      "js": [
+        "lib/bs58.js",
+        "utilities.js",
+        "sites/youtube.js"
+      ]
     }
   ],
-
   "permissions": [
     "*://graph.parami.io/",
     "*://cdn.discordapp.com/",
@@ -35,6 +65,5 @@
     "activeTab",
     "storage"
   ],
-
   "content_security_policy": "script-src 'self'; object-src 'self'"
 }

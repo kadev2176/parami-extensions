@@ -1,0 +1,18 @@
+yt-img-shadow {
+    position: relative;
+    overflow: initial !important;
+}
+
+yt-img-shadow[id*="avatar"] img,
+yt-img-shadow[class*="avatar"] img,
+yt-img-shadow[class*="ytd-topbar"] img,
+yt-img-shadow[class*="ytd-active-account-header"] img,
+yt-img-shadow[class*="ytd-comment"] img,
+yt-img-shadow[class*="ytd-video-owner"] img {
+    border-radius: 100% !important;
+    -webkit-border-radius: 100% !important;
+    -moz-border-radius: 100% !important;
+    -ms-border-radius: 100% !important;
+    -o-border-radius: 100% !important;
+    overflow: hidden;
+}

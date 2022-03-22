@@ -22,23 +22,20 @@
             }
         }
 
-        const avatars = document.querySelectorAll('img[src*="ggpht.com"]');
-        for (let i = 0; i < avatars.length; i += 1) {
-            const avatar = avatars[i];
-            if (!wm.has(avatar)) {
-                wm.set(avatar, true);
+        const imgs = document.querySelectorAll('img');
+        for (let i = 0; i < imgs.length; i += 1) {
+            const img = imgs[i];
+            if (!wm.has(img)) {
+                wm.set(img, true);
 
-                const ytImg = avatar.closest('yt-img-shadow');
-                if (!ytImg) continue;
-
-                const container = avatar.parentElement;
+                const container = img.parentElement;
+                const containerParent = img.parentElement.parentElement;
+                const containerParentParent = img.parentElement.parentElement.parentElement;
+                const containerParentParentParent = img.parentElement.parentElement.parentElement.parentElement;
                 if (container.querySelector(`.${window.pfp.labelName}`)) continue;
 
-                const uri = avatar.src;
-
-                const ext = uri.match(/s[0-9](.*?)-/)[0];
-
-                const url = uri.replace(/s[0-9](.*?)-/, 's512-', uri);
+                const url = img.src;
+                console.log(url)
 
                 let did = '';
                 let meta = null;
@@ -79,6 +76,14 @@
                 logo.src = chrome.runtime.getURL('/images/logo-round-core.svg');
 
                 span.append(logo);
+
+                container.style.overflow = 'initial';
+                containerParent.style.overflow = 'initial';
+                containerParentParent.style.overflow = 'initial';
+                containerParentParentParent.style.overflow = 'initial';
+
+                img.style.borderRadius = '100%';
+                img.style.overflow = 'hidden';
 
                 container.append(span);
             }

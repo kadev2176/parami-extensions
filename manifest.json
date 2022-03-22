@@ -68,6 +68,20 @@
         "utilities.js",
         "sites/weibo.js"
       ]
+    },
+    {
+      "matches": [
+        "*://*.mirror.xyz/*"
+      ],
+      "css": [
+        "styles/common.css",
+        "styles/mirror.css"
+      ],
+      "js": [
+        "lib/bs58.js",
+        "utilities.js",
+        "sites/mirror.js"
+      ]
     }
   ],
   "permissions": [

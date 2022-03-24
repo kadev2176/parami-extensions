@@ -37,6 +37,8 @@
 
         if (container.querySelector(`.${window.pfp.labelName}`)) continue;
 
+        if (a.href.endsWith('/followers_you_follow')) continue;
+
         const uri = new URL(avatar.src);
         const ext = uri.pathname.split('.').at(-1);
         const url = `${uri.origin}${uri.pathname
@@ -54,6 +56,8 @@
           const bin = await window.pfp.fetch(url);
           // eslint-disable-next-line no-await-in-loop
           const img = await window.pfp.solve(bin);
+
+          if (img.width < 20) continue;
 
           try {
             const aux = window.pfp.parse(img);

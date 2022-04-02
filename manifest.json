@@ -1,13 +1,13 @@
 {
   "manifest_version": 2,
-  "name": "PFP Link by Parami",
+  "name": "Parami Extension",
   "version": "1.0",
   "description": "Enable link from your PFP to Parami Protocol",
   "icons": {
-    "16": "/images/logo-16.png",
-    "32": "/images/logo-32.png",
-    "48": "/images/logo-48.png",
-    "128": "/images/logo-128.png"
+    "16": "/images/icon_16.png",
+    "32": "/images/icon_32.png",
+    "48": "/images/icon_48.png",
+    "128": "/images/icon_128.png"
   },
   "web_accessible_resources": [
     "/images/logo-round-core.svg"
@@ -84,6 +84,14 @@
       ]
     }
   ],
+  "browser_action": {
+    "default_icon": "/images/icon_32.png",
+    "default_title": "Parami Extensions",
+    "default_popup": "/page/popup.html"
+  },
+  "background": {
+    "service_worker": "/lib/background.js"
+  },
   "permissions": [
     "*://graph.parami.io/",
     "*://cdn.discordapp.com/",

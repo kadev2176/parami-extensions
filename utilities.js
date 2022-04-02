@@ -107,12 +107,12 @@
     get: async aux => {
       const { b58, hex } = aux;
       try {
-        const res = await fetch('https://graph.parami.io/', {
+        const res = await fetch(window.paramiServer.graph, {
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            query: `{dids(filter: {id: {equalTo: "${hex}"}}) {nodes {id}}}`,
+            query: `{assets(filter: {id: {equalTo: "${hex}"}}) {nodes {id}}}`,
           }),
           method: 'POST',
         });
@@ -120,7 +120,7 @@
         if (json.data.dids.nodes.length === 0) return null;
 
         return {
-          url: `https://app.parami.io/${b58}`,
+          url: `${window.paramiServer.rpc}/${b58}`,
         };
       } catch {
         return null;

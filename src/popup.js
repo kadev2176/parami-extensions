@@ -1,5 +1,6 @@
 'use strict';
 
+import { NETWORK_STAGE, NETWORK_TEST } from './models';
 import './popup.css';
 
 (() => {
@@ -20,30 +21,17 @@ import './popup.css';
 
   document.querySelector('#networkCheckbox').addEventListener('change', (e) => {
       if (e.target.checked) {
-          chrome.storage.sync.set(
-              {
-                  network: 'dev',
-              },
-          );
-          networkStorage.set('dev');
-          window.paramiServer = {
-              graph: 'https://staging.parami.io/graph/',
-              rpc: 'https://staging.parami.io/',
-          };
+          networkStorage.set(NETWORK_STAGE)
       } else {
-          networkStorage.set('test');
-          window.paramiServer = {
-              graph: 'https://graph.parami.io/',
-              rpc: 'https://app.parami.io/',
-          };
+          networkStorage.set(NETWORK_TEST)
       }
   });
 
   networkStorage.get(network => {
       if (typeof network === 'undefined') {
-          networkStorage.set('test');
+          networkStorage.set(NETWORK_TEST);
       } else {
-          networkStorage.set(network);
+          networkStorage.set(NETWORK_STAGE);
       }
   });
 })();

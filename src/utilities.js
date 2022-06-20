@@ -3,7 +3,8 @@
 
 import { ethers } from 'ethers';
 import abi from './mockAbi';
-import { EMPTY_CONTRACT, MULTI_JUMP_LIMIT, PARAMI_LINK_CONTRACT_ADDRESS, PREFIX_CONTRACT, PREFIX_HTTP, PREFIX_HTTPS, PREFIX_IPFS, PREFIX_IPFS_URL, PREFIX_WNFT } from './models';
+import { MULTI_JUMP_LIMIT, PARAMI_LINK_CONTRACT_ADDRESS, PREFIX_CONTRACT, PREFIX_DID, PREFIX_HTTP, PREFIX_HTTPS, PREFIX_IPFS, PREFIX_IPFS_URL, PREFIX_WNFT, TYPE_ID_2_STRING } from './models';
+import bs58 from 'bs58';
 
 /* eslint-disable no-bitwise */
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
@@ -275,19 +276,38 @@ export const solveBin = bin => {
 
 export const parseWnft = image => {
     const imageData = parse(image);
+
     const bitString = imageData.toString();
-    const contractAddressBits = bitString.slice(0, 160);
-    let contractAddress = PREFIX_CONTRACT;
+    const typeIdentifierBits = bitString.slice(0, 8)
+    const type = TYPE_ID_2_STRING[parseInt(typeIdentifierBits, 2)]
+
+    const hexBits = bitString.slice(8, 168);
+    let address = PREFIX_CONTRACT;
     for (let i = 0; i < 40; i++) {
         const startIndex = i * 4;
-        contractAddress += parseInt(contractAddressBits.slice(startIndex, startIndex + 4), 2).toString(16);
+        address += parseInt(hexBits.slice(startIndex, startIndex + 4), 2).toString(16);
     }
 
-    if (contractAddress && ethers.utils.isAddress(contractAddress) && contractAddress !== EMPTY_CONTRACT) {
+    if (type === 'wnft') {
         const tokenId = parseInt(bitString.slice(224), 2);
-        return `${PREFIX_WNFT}${contractAddress}?tokenId=${tokenId}`;
+        return `${PREFIX_WNFT}${address}?tokenId=${tokenId}`;
+    } else if (type === 'did') {
+        return `${PREFIX_DID}${address}`;
     }
     return '';
+}
+
+export const fromHexString = (hexString) => {
+    if(hexString === null) {
+        return new Uint8Array(0);
+    }
+    let tmp=hexString;
+    if(hexString.indexOf('0x') === 0) {
+        tmp=hexString.substring(2);
+    }
+    const matches = tmp.match(/.{1,2}/g);
+    if (matches === null) throw new Error('Invalid hex string');
+    return new Uint8Array(matches.map(byte => parseInt(byte, 16)));
 }
 
 export const parseMetaLink = async (metaLink, jumps) => {
@@ -295,12 +315,12 @@ export const parseMetaLink = async (metaLink, jumps) => {
         return '';
     }
 
-    if (metaLink.startsWith(PREFIX_HTTP) || metaLink.startsWith(PREFIX_HTTPS)) {
-        return metaLink;
-    } else if (metaLink.startsWith(PREFIX_IPFS)) {
-        return `${PREFIX_IPFS_URL}${metaLink.slice(7)}`;
-    } else if (metaLink.startsWith(PREFIX_WNFT)) {
-        try {
+    try {
+        if (metaLink.startsWith(PREFIX_HTTP) || metaLink.startsWith(PREFIX_HTTPS)) {
+            return metaLink;
+        } else if (metaLink.startsWith(PREFIX_IPFS)) {
+            return `${PREFIX_IPFS_URL}${metaLink.slice(7)}`;
+        } else if (metaLink.startsWith(PREFIX_WNFT)) {
             // get contract
             const parts = metaLink.split('?');
             const contractAddress = parts[0].slice(7);
@@ -316,11 +336,47 @@ export const parseMetaLink = async (metaLink, jumps) => {
             // get new meta link
             const newMetaLink = (await wContract.getValue(tokenId, PARAMI_LINK_CONTRACT_ADDRESS)).toString();
             return parseMetaLink(newMetaLink, jumps + 1);
-        } catch (e) {
-            console.log('Parse meta link error:', e);
+        } else if (metaLink.startsWith(PREFIX_DID)) {
+            const didHex = metaLink.slice(6);
+
+            try {
+                const paramiServer = await new Promise((resolve, reject) => {
+                    chrome.storage.sync.get(['network'], res => {
+                        if (chrome.runtime.lastError) {
+                            return reject(chrome.runtime.lastError);
+                        }
+
+                        resolve(res.network);
+                    });
+                });
+                
+                // Validates KOL. Currently Not Used
+                //
+                // const res = await fetch(paramiServer.graph, {
+                // headers: {
+                //     'Content-Type': 'application/json',
+                // },
+                // body: JSON.stringify({
+                //     query: `{assets(filter: {id: {equalTo: "${didHex}"}}) {nodes {id}}}`,
+                // }),
+                // method: 'POST',
+                // });
+                // const json = await res.json();
+                // if (json?.data?.dids?.nodes?.length === 0) {
+                //     console.log('No assets for did:', didHex);
+                //     console.log('Yet continue anyway...')
+                // };
+
+                const didBs58 = bs58.encode(fromHexString(didHex));
+                return `${paramiServer.rpc}did:ad3:${didBs58}`;
+            } catch {
+                return null;
+            }
+        } else {
             return '';
         }
-    } else {
+    } catch (e) {
+        console.log('Parse meta link error:', e);
         return '';
     }
 }

@@ -330,7 +330,7 @@ export const parseMetaLink = async (metaLink, jumps) => {
             const wContract = new ethers.Contract(
                 contractAddress,
                 abi,
-                ethers.getDefaultProvider('rinkeby')
+                ethers.getDefaultProvider()
             );
 
             // get new meta link

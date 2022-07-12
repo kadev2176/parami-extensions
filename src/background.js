@@ -5,6 +5,8 @@
 // For more information on background script,
 // See https://developer.chrome.com/extensions/background_pages
 
+import { NETWORK_TEST } from './models';
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'GREETINGS') {
     const message = `Hi ${
@@ -19,3 +21,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
   }
 });
+
+chrome.tabs.onUpdated.addListener(
+  function(tabId, changeInfo, tab) {
+    // read changeInfo data and do something with it
+    // like send the new url to contentscripts.js
+    if (changeInfo.url) {
+      chrome.tabs.sendMessage( tabId, {
+        message: 'UrlChange',
+        url: changeInfo.url
+      })
+    }
+  }
+);
+
+chrome.storage.sync.set(
+  {
+      network: NETWORK_TEST,
+  },
+);

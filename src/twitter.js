@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 import abi from './mockAbi';
 
 (() => {
-    const wm = new WeakMap();
+    const nodeMap = new Map();
     const imgUrl2Wnft = new Map();
     const wnft2href = new Map();
   
@@ -31,8 +31,8 @@ import abi from './mockAbi';
   
       for (let i = 0; i < avatars.length; i += 1) {
         const avatar = avatars[i];
-        if (!wm.has(avatar)) {
-          wm.set(avatar, true);
+        if (!nodeMap.has(avatar)) {
+          nodeMap.set(avatar, true);
   
           const a = avatar.closest('a');
   
@@ -103,5 +103,16 @@ import abi from './mockAbi';
     observer.observe(document, {
       subtree: true,
       childList: true,
+    });
+
+    chrome.runtime.onMessage.addListener(
+      function(request, sender, sendResponse) {
+        // listen for messages sent from background.js
+        if (request.message === 'UrlChange') {
+          // clear cache
+          nodeMap.clear();
+          imgUrl2Wnft.clear();
+          wnft2href.clear();
+        }
     });
 })();

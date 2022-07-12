@@ -334,8 +334,21 @@ export const parseMetaLink = async (metaLink, jumps) => {
             );
 
             // get new meta link
-            const newMetaLink = (await wContract.getValue(tokenId, PARAMI_LINK_CONTRACT_ADDRESS)).toString();
-            return parseMetaLink(newMetaLink, jumps + 1);
+            try {
+                const newLink = (await wContract.getValue(tokenId, PARAMI_LINK_CONTRACT_ADDRESS)).toString();
+                if (newLink) {
+                    return parseMetaLink(newLink, jumps + 1);
+                }
+
+                // get owner link
+                const contractOwnerResp = await wContract.owner();
+                const ownerTokenIdResp = await wContract.tokenOfOwnerByIndex(contractOwnerResp.toString(), 0);
+                const ownerLink = (await wContract.getValue(ownerTokenIdResp.toString(), PARAMI_LINK_CONTRACT_ADDRESS)).toString();
+                return parseMetaLink(ownerLink || 'https://app.parami.io', jumps + 1);
+            } catch (e) {
+                console.log('[Parami Extension] Get link error', e);
+                return 'https://app.parami.io';
+            }
         } else if (metaLink.startsWith(PREFIX_DID)) {
             const didHex = metaLink.slice(6);
 

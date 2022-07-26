@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Parami WNFT Extension",
+  "name": "Parami Hyperlink NFT Extension",
   "version": "0.1.0",
   "description": "Enable link from your PFP to Parami Protocol",
   "icons": {
@@ -19,7 +19,7 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Parami WNFT Extension",
+    "default_title": "Parami Hyperlink NFT Extension",
     "default_popup": "popup.html",
     "default_icon": "icons/icon_32.png"
   },

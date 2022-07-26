@@ -52,6 +52,15 @@
       "css": [
         "twitter.css"
       ]
+    },
+    {
+      "matches": [
+        "https://app.parami.io/*"
+      ],
+      "run_at": "document_idle",
+      "js": [
+        "parami.js"
+      ]
     }
   ]
 }

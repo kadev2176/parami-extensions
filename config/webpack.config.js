@@ -13,6 +13,7 @@ const config = (env, argv) =>
       contentScript: PATHS.src + '/contentScript.js',
       twitter: PATHS.src + '/twitter.js',
       background: PATHS.src + '/background.js',
+      parami: PATHS.src + '/parami.js'
     },
     devtool: argv.mode === 'production' ? false : 'source-map',
   });

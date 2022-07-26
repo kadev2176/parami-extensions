@@ -1,37 +1,37 @@
 'use strict';
 
-import { NETWORK_STAGE, NETWORK_TEST } from './models';
+import { NETWORK_TEST, NETWORK_MAINNET } from './models';
 import './popup.css';
 
 (() => {
-  const networkStorage = {
-      get: cb => {
-          chrome.storage.sync.get(['network'], result => {
-              cb(result.network);
-          });
-      },
-      set: (value) => {
-          chrome.storage.sync.set(
-              {
-                  network: value,
-              },
-          );
-      },
-  };
+    const networkStorage = {
+        get: cb => {
+            chrome.storage.sync.get(['network'], result => {
+                cb(result.network);
+            });
+        },
+        set: (value) => {
+            chrome.storage.sync.set(
+                {
+                    network: value,
+                },
+            );
+        },
+    };
 
-  document.querySelector('#networkCheckbox').addEventListener('change', (e) => {
-      if (e.target.checked) {
-          networkStorage.set(NETWORK_STAGE)
-      } else {
-          networkStorage.set(NETWORK_TEST)
-      }
-  });
+    const checkbox = document.querySelector('#networkCheckbox');
 
-  networkStorage.get(network => {
-      if (typeof network === 'undefined') {
-          networkStorage.set(NETWORK_TEST);
-      } else {
-          networkStorage.set(NETWORK_STAGE);
-      }
-  });
+    networkStorage.get(network => {
+        if (network?.chainId === 4) {
+            checkbox.setAttribute('checked', true);
+        }
+    });
+
+    checkbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            networkStorage.set(NETWORK_TEST)
+        } else {
+            networkStorage.set(NETWORK_MAINNET)
+        }
+    });
 })();

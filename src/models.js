@@ -18,19 +18,21 @@ export const LINK_BADGE_CLASSNAME = 'pfp-link-badge';
 
 export const MULTI_JUMP_LIMIT = 5;
 
-export const PARAMI_LINK_CONTRACT_ADDRESS = '0x955A4432662Cf9F5A2d06FfEBff712bDCAfEA55F';
-
 export const TYPE_ID_2_STRING = {
     '1': 'wnft',
     '2': 'did'
 }
 
-export const NETWORK_TEST = {
+export const NETWORK_MAINNET = {
     graph: 'https://graph.parami.io/',
-    rpc: 'https://app.parami.io/'
+    rpc: 'https://app.parami.io/',
+    paramiLinkAddress: '0x955A4432662Cf9F5A2d06FfEBff712bDCAfEA55F',
+    chainId: 1
 }
 
-export const NETWORK_STAGE = {
+export const NETWORK_TEST = {
     graph: 'https://staging.parami.io/graph/',
-    rpc: 'https://staging.parami.io/'
+    rpc: 'https://staging.parami.io/',
+    paramiLinkAddress: '0x7F1Ae9F3740A9192fb10Ec8Cff48B9401f61f74A',
+    chainId: 4
 }

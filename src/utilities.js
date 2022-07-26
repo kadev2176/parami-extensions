@@ -3,7 +3,7 @@
 
 import { ethers } from 'ethers';
 import abi from './mockAbi';
-import { MULTI_JUMP_LIMIT, PARAMI_LINK_CONTRACT_ADDRESS, PREFIX_CONTRACT, PREFIX_DID, PREFIX_HTTP, PREFIX_HTTPS, PREFIX_IPFS, PREFIX_IPFS_URL, PREFIX_WNFT, TYPE_ID_2_STRING } from './models';
+import { MULTI_JUMP_LIMIT, PREFIX_CONTRACT, PREFIX_DID, PREFIX_HTTP, PREFIX_HTTPS, PREFIX_IPFS, PREFIX_IPFS_URL, PREFIX_WNFT, TYPE_ID_2_STRING } from './models';
 import bs58 from 'bs58';
 
 /* eslint-disable no-bitwise */
@@ -310,6 +310,18 @@ export const fromHexString = (hexString) => {
     return new Uint8Array(matches.map(byte => parseInt(byte, 16)));
 }
 
+const getParamiServer = async () => {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get(['network'], res => {
+            if (chrome.runtime.lastError) {
+                return reject(chrome.runtime.lastError);
+            }
+
+            resolve(res.network);
+        });
+    });
+}
+
 export const parseMetaLink = async (metaLink, jumps) => {
     if (jumps > MULTI_JUMP_LIMIT) {
         return '';
@@ -327,15 +339,16 @@ export const parseMetaLink = async (metaLink, jumps) => {
             const params = new URLSearchParams(parts[1]);
             const tokenId = parseInt(params.get('tokenId'), 10);
 
+            const paramiServer = await getParamiServer();
             const wContract = new ethers.Contract(
                 contractAddress,
                 abi,
-                ethers.getDefaultProvider()
+                ethers.getDefaultProvider(paramiServer.chainId)
             );
 
             // get new meta link
             try {
-                const newLink = (await wContract.getValue(tokenId, PARAMI_LINK_CONTRACT_ADDRESS)).toString();
+                const newLink = (await wContract.getValue(tokenId, paramiServer.paramiLinkAddress)).toString();
                 if (newLink) {
                     return parseMetaLink(newLink, jumps + 1);
                 }
@@ -343,25 +356,17 @@ export const parseMetaLink = async (metaLink, jumps) => {
                 // get owner link
                 const contractOwnerResp = await wContract.owner();
                 const ownerTokenIdResp = await wContract.tokenOfOwnerByIndex(contractOwnerResp.toString(), 0);
-                const ownerLink = (await wContract.getValue(ownerTokenIdResp.toString(), PARAMI_LINK_CONTRACT_ADDRESS)).toString();
+                const ownerLink = (await wContract.getValue(ownerTokenIdResp.toString(), paramiServer.paramiLinkAddress)).toString();
                 return parseMetaLink(ownerLink || 'https://app.parami.io', jumps + 1);
             } catch (e) {
-                console.log('[Parami Extension] Get link error', e);
+                console.error('[Parami Extension] Get link error', e);
                 return 'https://app.parami.io';
             }
         } else if (metaLink.startsWith(PREFIX_DID)) {
             const didHex = metaLink.slice(6);
 
             try {
-                const paramiServer = await new Promise((resolve, reject) => {
-                    chrome.storage.sync.get(['network'], res => {
-                        if (chrome.runtime.lastError) {
-                            return reject(chrome.runtime.lastError);
-                        }
-
-                        resolve(res.network);
-                    });
-                });
+                const paramiServer = await getParamiServer();
                 
                 // Validates KOL. Currently Not Used
                 //

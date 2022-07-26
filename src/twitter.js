@@ -1,7 +1,7 @@
 'use strict';
 
 import './common.css';
-import { LINK_BADGE_CLASSNAME, W_CONTRACT_ADDRESS } from './models';
+import { LINK_BADGE_CLASSNAME } from './models';
 import { fetchBin, solveBin, parseWnft, parseMetaLink } from './utilities';
 import { ethers } from 'ethers';
 import abi from './mockAbi';

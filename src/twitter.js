@@ -3,8 +3,6 @@
 import './common.css';
 import { LINK_BADGE_CLASSNAME } from './models';
 import { fetchBin, solveBin, parseWnft, parseMetaLink } from './utilities';
-import { ethers } from 'ethers';
-import abi from './mockAbi';
 
 (() => {
     const nodeMap = new Map();

@@ -26,7 +26,7 @@ body {
     max-width: 100%;
     padding: 0;
     text-align: left;
-    width: 560px;
+    width: 350px;
 }
 
 .mainContainer {
@@ -46,8 +46,12 @@ body {
     max-width: 100%;
     box-sizing: border-box;
     font-weight: normal;
-    margin: 0px 0px 25px;
+    margin: 0px 0px 5px;
     position: relative;
+}
+
+.mainContainer .contentContainer {
+    padding: 10px;
 }
 
 .mainContainer .headerContainer .wrapper {
@@ -172,4 +176,20 @@ body {
 
 .mainContainer .headerContainer .wrapper .menuModal .menuItem .switch label .checkbox:checked + .slider::before {
     transform: translateX(24px);
+}
+
+.jumpLink {
+    box-shadow: 0 4px 14px 0 rgb(255 91 0 / 39%);
+    border: none;
+    background: #ff5b00;
+    width: 200px;
+    height: 40px;
+    border-radius: 20px;
+    display: block;
+    margin: auto;
+    color: #fff;
+    text-align: center;
+    line-height: 40px;
+    text-decoration: auto;
+    cursor: pointer;
 }

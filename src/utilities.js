@@ -2,7 +2,7 @@
 "use strict";
 
 import { ethers } from 'ethers';
-import abi from './mockAbi';
+import hcontract from './ERC721HCollection.json';
 import { MULTI_JUMP_LIMIT, PREFIX_CONTRACT, PREFIX_DID, PREFIX_HTTP, PREFIX_HTTPS, PREFIX_IPFS, PREFIX_IPFS_URL, PREFIX_WNFT, TYPE_ID_2_STRING } from './models';
 import bs58 from 'bs58';
 
@@ -342,22 +342,23 @@ export const parseMetaLink = async (metaLink, jumps) => {
             const paramiServer = await getParamiServer();
             const wContract = new ethers.Contract(
                 contractAddress,
-                abi,
+                hcontract.abi,
                 ethers.getDefaultProvider(paramiServer.chainId)
             );
 
             // get new meta link
             try {
-                const newLink = (await wContract.getValue(tokenId, paramiServer.paramiLinkAddress)).toString();
-                if (newLink) {
-                    return parseMetaLink(newLink, jumps + 1);
-                }
+                const newLink = (await wContract.getSlotUri(tokenId, paramiServer.paramiLinkAddress)).toString();
+                return parseMetaLink(newLink || 'https://app.parami.io', jumps + 1);
+                // if (newLink) {
+                //     return parseMetaLink(newLink, jumps + 1);
+                // }
 
                 // get owner link
-                const contractOwnerResp = await wContract.owner();
-                const ownerTokenIdResp = await wContract.tokenOfOwnerByIndex(contractOwnerResp.toString(), 0);
-                const ownerLink = (await wContract.getValue(ownerTokenIdResp.toString(), paramiServer.paramiLinkAddress)).toString();
-                return parseMetaLink(ownerLink || 'https://app.parami.io', jumps + 1);
+                // const contractOwnerResp = await wContract.owner();
+                // const ownerTokenIdResp = await wContract.tokenOfOwnerByIndex(contractOwnerResp.toString(), 0);
+                // const ownerLink = (await wContract.getValue(ownerTokenIdResp.toString(), paramiServer.paramiLinkAddress)).toString();
+                // return parseMetaLink(ownerLink || 'https://app.parami.io', jumps + 1);
             } catch (e) {
                 console.error('[Parami Extension] Get link error', e);
                 return 'https://app.parami.io';

@@ -5,7 +5,7 @@
 // For more information on background script,
 // See https://developer.chrome.com/extensions/background_pages
 
-import { NETWORK_MAINNET } from './models';
+import { NETWORK_MAINNET, NETWORK_TEST } from './models';
 
 chrome.storage.sync.set(
   {

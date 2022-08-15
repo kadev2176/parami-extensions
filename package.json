@@ -1,6 +1,6 @@
 {
   "name": "parami-extension-wnft",
-  "version": "0.0.0.1",
+  "version": "0.0.1",
   "description": "Parami Extension wNFT",
   "private": true,
   "scripts": {

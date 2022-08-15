@@ -10,7 +10,6 @@ const config = (env, argv) =>
   merge(common, {
     entry: {
       popup: PATHS.src + '/popup.js',
-      contentScript: PATHS.src + '/contentScript.js',
       twitter: PATHS.src + '/twitter.js',
       background: PATHS.src + '/background.js',
       parami: PATHS.src + '/parami.js'

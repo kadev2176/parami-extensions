@@ -17,12 +17,6 @@ import './popup.css';
         },
     };
 
-    networkStorage.get(network => {
-        if (network?.chainId === 4) {
-            checkbox.setAttribute('checked', true);
-        }
-    });
-
     const accountInfoNode = document.querySelector('#accountInfo');
     const jumpLinkContainer = document.querySelector('#jumpLinkContainer');
     chrome.storage.sync.get(['did'], res => {

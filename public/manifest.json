@@ -24,18 +24,10 @@
     "default_icon": "icons/icon_32.png"
   },
   "permissions": [
-    "tabs",
     "activeTab",
     "storage"
   ],
-  "host_permissions": [
-    "*://graph.parami.io/",
-    "*://cdn.discordapp.com/",
-    "*://*.twitter.com/",
-    "*://*.twimg.com/",
-    "*://*.ggpht.com/",
-    "*://*.sinaimg.cn/"
-  ],
+  "host_permissions": [],
   "content_security_policy": {
     "script-src": "self",
     "object-src": "self"

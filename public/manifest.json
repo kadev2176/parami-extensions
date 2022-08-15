@@ -24,7 +24,6 @@
     "default_icon": "icons/icon_32.png"
   },
   "permissions": [
-    "activeTab",
     "storage"
   ],
   "host_permissions": [],

@@ -26,7 +26,7 @@ export const TYPE_ID_2_STRING = {
 export const NETWORK_MAINNET = {
     graph: 'https://graph.parami.io/',
     rpc: 'https://app.parami.io/',
-    paramiLinkAddress: '0xEC5ecECBd5375575503130ce6a01166eC875FEcD', // todo: change this
+    paramiLinkAddress: '0x7A585595490328503eb3609723B0B16Eb0373013',
     chainId: 1
 }
 

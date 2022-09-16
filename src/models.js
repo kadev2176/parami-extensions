@@ -26,13 +26,13 @@ export const TYPE_ID_2_STRING = {
 export const NETWORK_MAINNET = {
     graph: 'https://graph.parami.io/',
     rpc: 'https://app.parami.io/',
-    paramiLinkAddress: '0xEC5ecECBd5375575503130ce6a01166eC875FEcD',
+    paramiLinkAddress: '0x7A585595490328503eb3609723B0B16Eb0373013',
     chainId: 1
 }
 
 export const NETWORK_TEST = {
     graph: 'https://staging.parami.io/graph/',
     rpc: 'https://staging.parami.io/',
-    paramiLinkAddress: '0xC6BfB27A439c792Cb919B923305b5f927DA8B58F',
+    paramiLinkAddress: '0x75EE8Ce53Bd26C21405Def16Dd416C90054E7146',
     chainId: 4
 }

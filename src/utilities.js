@@ -340,7 +340,7 @@ export const parseMetaLink = async (metaLink, jumps) => {
             const tokenId = parseInt(params.get('tokenId'), 10);
 
             const paramiServer = await getParamiServer();
-            const wContract = new ethers.Contract(
+            const hContract = new ethers.Contract(
                 contractAddress,
                 hcontract.abi,
                 ethers.getDefaultProvider(paramiServer.chainId)
@@ -348,17 +348,8 @@ export const parseMetaLink = async (metaLink, jumps) => {
 
             // get new meta link
             try {
-                const newLink = (await wContract.getSlotUri(tokenId, paramiServer.paramiLinkAddress)).toString();
+                const newLink = (await hContract.getSlotUri(tokenId, paramiServer.paramiLinkAddress)).toString();
                 return parseMetaLink(newLink || 'https://app.parami.io', jumps + 1);
-                // if (newLink) {
-                //     return parseMetaLink(newLink, jumps + 1);
-                // }
-
-                // get owner link
-                // const contractOwnerResp = await wContract.owner();
-                // const ownerTokenIdResp = await wContract.tokenOfOwnerByIndex(contractOwnerResp.toString(), 0);
-                // const ownerLink = (await wContract.getValue(ownerTokenIdResp.toString(), paramiServer.paramiLinkAddress)).toString();
-                // return parseMetaLink(ownerLink || 'https://app.parami.io', jumps + 1);
             } catch (e) {
                 console.error('[Parami Extension] Get link error', e);
                 return 'https://app.parami.io';
@@ -368,24 +359,6 @@ export const parseMetaLink = async (metaLink, jumps) => {
 
             try {
                 const paramiServer = await getParamiServer();
-                
-                // Validates KOL. Currently Not Used
-                //
-                // const res = await fetch(paramiServer.graph, {
-                // headers: {
-                //     'Content-Type': 'application/json',
-                // },
-                // body: JSON.stringify({
-                //     query: `{assets(filter: {id: {equalTo: "${didHex}"}}) {nodes {id}}}`,
-                // }),
-                // method: 'POST',
-                // });
-                // const json = await res.json();
-                // if (json?.data?.dids?.nodes?.length === 0) {
-                //     console.log('No assets for did:', didHex);
-                //     console.log('Yet continue anyway...')
-                // };
-
                 const didBs58 = bs58.encode(fromHexString(didHex));
                 return `${paramiServer.rpc}did:ad3:${didBs58}`;
             } catch {

@@ -22,9 +22,7 @@ chrome.storage.sync.set(
   await cryptoWaitReady();
   const provider = new WsProvider(config.socketServer);
   const api = await ApiPromise.create({
-    provider,
-    types: config.types,
-    rpc: config.rpc
+    provider
   });
 
   const fetchAdIcon = async (nftId) => {
@@ -38,13 +36,11 @@ chrome.storage.sync.set(
       if (slotResp.isEmpty) return null;
 
       const slot = slotResp.toHuman();
-      console.log('Get slot', slot);
       const adResp = await api.query.ad.metadata(slot.adId);
 
       if (adResp.isEmpty) return null;
 
       const ad = adResp.toHuman();
-      console.log('Get ad metadata', ad);
 
       if (ad?.metadata?.indexOf('ipfs://') < 0) return null;
 
@@ -52,7 +48,6 @@ chrome.storage.sync.set(
 
       const res = await fetch(config.ipfsEndpoint + hash);
       const adJson = await res.json();
-      console.log('Get ad Json', adJson);
       return adJson.icon;
     } catch (e) {
       return null;

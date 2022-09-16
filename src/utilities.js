@@ -372,3 +372,16 @@ export const parseMetaLink = async (metaLink, jumps) => {
         return '';
     }
 }
+
+export const parseNftIdFromUrl = (url) => {
+    if (!url.startsWith('https://app.parami.io/did:ad3:')) {
+        return null;
+    }
+
+    const nftId = parseInt(url.substring(58), 10);
+    if (isNaN(nftId)) {
+        return null;
+    }
+    
+    return nftId.toString();
+}

@@ -9,8 +9,7 @@ import { NETWORK_MAINNET, NETWORK_TEST } from './models';
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { config } from './config';
-
-const defaultAdIcon = chrome.runtime.getURL('icons/logo-round-core.svg');
+import { deleteComma } from './utilities';
 
 chrome.storage.sync.set(
   {
@@ -25,7 +24,8 @@ chrome.storage.sync.set(
     provider
   });
 
-  const fetchAdIcon = async (nftId) => {
+  const fetchAd = async (nftId, did) => {
+    console.log('fetch ad', nftId, did);
     if (!nftId) {
       return null;
     }
@@ -35,8 +35,8 @@ chrome.storage.sync.set(
 
       if (slotResp.isEmpty) return null;
 
-      const slot = slotResp.toHuman();
-      const adResp = await api.query.ad.metadata(slot.adId);
+      const { adId, budgetPot, fractionId } = slotResp.toHuman();
+      const adResp = await api.query.ad.metadata(adId);
 
       if (adResp.isEmpty) return null;
 
@@ -46,20 +46,43 @@ chrome.storage.sync.set(
 
       const hash = ad?.metadata?.substring(7);
 
-      const res = await fetch(config.ipfsEndpoint + hash);
-      const adJson = await res.json();
-      return adJson.icon;
+      const adJsonResp = await fetch(config.ipfsEndpoint + hash);
+      const adJson = await adJsonResp.json();
+
+      const adClaimed = did ? !(await api.query.ad.payout(adId, did)).isEmpty : false;
+
+      const balanceResp = await api.query.assets.account(Number(deleteComma(fractionId)), budgetPot);
+      const balance = balanceResp.isEmpty ? '0' : balanceResp.toHuman();
+
+      const nftInfo = await api.query.nft.metadata(nftId);
+      const tokenAssetId = nftInfo.isEmpty ? '' : (nftInfo.toHuman()).tokenAssetId;
+
+      const assetInfo = await api.query.assets.metadata(Number(deleteComma(tokenAssetId)));
+      const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
+
+      return {
+        ...adJson,
+        adId,
+        adClaimed,
+        nftId,
+        insufficientBalance: ad.payoutMax && BigInt(deleteComma(balance.balance)) < BigInt(deleteComma(ad.payoutMax)),
+        userDid: did,
+        tokenSymbol: asset.symbol ?? 'Token'
+      };
     } catch (e) {
+      console.log(e);
       return null;
     }
   }
 
   chrome.runtime.onMessage.addListener(
     (request, sender, sendResponse) => {
-      if (request.method === 'fetchAdIcon') {
-        fetchAdIcon(request.nftId).then(icon => {
-          sendResponse({
-            adIcon: icon ?? defaultAdIcon
+      if (request.method === 'fetchAd') {
+        chrome.storage.sync.get(['didHex'], res => {
+          fetchAd(request.nftId, res?.didHex).then(ad => {
+            sendResponse({
+              ad
+            });
           });
         });
       }

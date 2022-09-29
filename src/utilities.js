@@ -378,10 +378,14 @@ export const parseNftIdFromUrl = (url) => {
         return null;
     }
 
-    const nftId = parseInt(url.substring(58), 10);
+    const nftId = parseInt(url.substring(30).split('/')[1], 10);
     if (isNaN(nftId)) {
         return null;
     }
     
     return nftId.toString();
+}
+
+export const deleteComma = (value) => {
+    return (value ?? '').replace(/,/g, '');
 }

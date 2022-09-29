@@ -1,15 +1,17 @@
-'use strict';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import './index.css';
+import { LINK_BADGE_CLASSNAME } from '../models';
+import { fetchBin, solveBin, parseWnft, parseMetaLink, parseNftIdFromUrl } from '../utilities';
+import AdIcon from './AdIcon/AdIcon';
+import 'antd/dist/antd.css';
 
-import './common.css';
-import { LINK_BADGE_CLASSNAME } from './models';
-import { fetchBin, solveBin, parseWnft, parseMetaLink, parseNftIdFromUrl } from './utilities';
-
-export const addTwitterIcons = () => {
+(() => {
   const nodeMap = new Map();
   const imgUrl2Wnft = new Map();
   const wnft2href = new Map();
 
-  const callback = async mutations => {
+  const callback = async (mutations: any) => {
     for (let i = 0; i < mutations.length; i += 1) {
       const mutation = mutations[i];
 
@@ -28,15 +30,15 @@ export const addTwitterIcons = () => {
     const avatars = document.querySelectorAll('img[src*="profile_images"]');
 
     for (let i = 0; i < avatars.length; i += 1) {
-      const avatar = avatars[i];
+      const avatar = avatars[i] as HTMLImageElement;
       if (!nodeMap.has(avatar)) {
         nodeMap.set(avatar, true);
 
-        const a = avatar.closest('a');
+        const a = avatar.closest('a') as HTMLAnchorElement;
 
         if (!a) continue;
 
-        const container = a.parentElement.parentElement;
+        const container = a.parentElement!.parentElement!;
 
         if (container.querySelector(`.${LINK_BADGE_CLASSNAME}`)) continue;
 
@@ -73,33 +75,25 @@ export const addTwitterIcons = () => {
 
         if (!wnftUrl) continue;
 
-        let href;
+        let href: string;
         if (!wnft2href.has(wnftUrl)) {
           href = await parseMetaLink(wnftUrl, 0);
           wnft2href.set(wnftUrl, href);
         }
         href = wnft2href.get(wnftUrl);
         if (href) {
-          const span = document.createElement('a');
-          span.href = href;
-          span.target = '_blank';
-          span.className = LINK_BADGE_CLASSNAME;
-          span.style.opacity = 1;
-
-          const logo = document.createElement('img');
-          logo.setAttribute('referrerpolicy', 'no-referrer');
+          const adIconContainer = document.createElement('div');
+          container.prepend(adIconContainer);
+          const root = createRoot(adIconContainer);
 
           const nftId = parseNftIdFromUrl(href);
           if (nftId) {
-            chrome.runtime.sendMessage({ method: 'fetchAdIcon', nftId }, (response) => {
-              logo.src = response.adIcon;
-              span.append(logo);
-              container.prepend(span);
+            chrome.runtime.sendMessage({ method: 'fetchAd', nftId }, (response) => {
+              const { ad } = response;
+              root.render(<AdIcon ad={ad} href={href} />);
             });
           } else {
-            logo.src = chrome.runtime.getURL('icons/logo-round-core.svg');
-            span.append(logo);
-            container.prepend(span);
+            root.render(<AdIcon href={href} />);
           }
         }
       }
@@ -123,4 +117,4 @@ export const addTwitterIcons = () => {
         wnft2href.clear();
       }
     });
-};
+})();

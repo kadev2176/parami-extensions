@@ -11,12 +11,14 @@ import { fromHexString } from './utilities';
     chrome.storage.sync.set(
       {
         did: `did:ad3:${didBs58}`,
+        didHex
       },
     );
   } else {
     chrome.storage.sync.set(
       {
         did: '',
+        didHex: ''
       },
     );
   }

@@ -91,7 +91,7 @@ import 'antd/dist/antd.css';
           if (nftId) {
             chrome.runtime.sendMessage({ method: 'fetchAd', nftId }, (response) => {
               const { ad } = response;
-              root.render(<AdIcon ad={ad} href={href} />);
+              root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} />);
             });
           } else {
             root.render(<AdIcon href={href} />);
@@ -107,6 +107,8 @@ import 'antd/dist/antd.css';
     subtree: true,
     childList: true,
   });
+
+  chrome.runtime.sendMessage({ method: 'openTwitterTab' });
 
   chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {

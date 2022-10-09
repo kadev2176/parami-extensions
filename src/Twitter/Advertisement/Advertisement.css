@@ -1,5 +1,5 @@
 .advertisementContainer {
-  max-width: 500px;
+  max-width: 400px;
   font-size: 12px;
 }
 
@@ -62,8 +62,6 @@
 .adDescription {
   background: #EFEFEF;
   padding: 9px 12px;
-  font-size: 14px;
-  font-weight: 700;
 }
 
 .descriptionText {
@@ -71,11 +69,13 @@
 }
 
 .adDescription .tags .tag {
+  font-size: 14px;
+  font-weight: 700;
   margin-right: 5px;
 }
 
 .claimSection {
-  padding: 10px 12px;
+  padding: 8px 8px;
 }
 
 .claimSection .infoText {
@@ -102,13 +102,22 @@
   margin-right: 6px;
 }
 
-.rewardInfo .rewardAmount {
+.rewardInfo .rewardNumber {
   font-size: 16px;
   font-weight: 700;
+  margin-right: 4px;
+}
+
+.rewardInfo .rewardToken {
+  font-size: 12px;
 }
 
 .rewardRow .buttons {
   display: flex;
+  font-size: 12px;
+  min-width: 195px;
+  transform: scale(0.9);
+  transform-origin: 100% center;
 }
 
 .rewardRow .buttons .btn {
@@ -128,6 +137,10 @@
 
 .instructionsBtn {
   border-radius: 0 13px 13px 0;
+}
+
+.createDidBtn {
+  border-radius: 13px;
 }
 
 .instructions {
@@ -182,7 +195,7 @@
   height: 30px;
   position: absolute;
   transform: rotate(45deg);
-  left: 430px;
+  left: 85%;
   top: 0px;
   z-index: 0;
 }

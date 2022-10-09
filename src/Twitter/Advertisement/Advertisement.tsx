@@ -1,14 +1,12 @@
-import { Button, Card, Tooltip } from 'antd';
 import React, { useCallback, useState } from 'react';
 import './Advertisement.css';
-import { MoneyCollectOutlined, WalletOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import ParamiScoreTag from '../ParamiScoreTag/ParamiScoreTag';
-import ParamiScore from '../ParamiScore/ParamiScore';
 import config from '../../config';
 
 const Advertisement: React.FC<{
 	ad: any;
-}> = ({ ad }) => {
+	avatarSrc?: string;
+	userDid: string;
+}> = ({ ad, avatarSrc, userDid }) => {
 
 	const [showInstructions, setShowInstructions] = useState<boolean>(false);
 	const [closePopoverTimeout, setClosePopoverTimeout] = useState<any>();
@@ -16,23 +14,11 @@ const Advertisement: React.FC<{
 	const tags = (ad?.instructions ?? []).map((instruction: any) => instruction.tag).filter(Boolean);
 
 	const openClaimWindow = () => {
-		window.open(`${config.paramiWallet}/claim/${ad.adId}/${ad.nftId}`, 'ParamiClaim', 'popup,width=400,height=600');
+		window.open(`${config.paramiWallet}/claim/${ad.adId}/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
 	}
 
-	const gotoWalletButton = (btnText: string) => {
-		return <Button
-			block
-			type='primary'
-			shape='round'
-			size='large'
-			className='actionBtn'
-			icon={<WalletOutlined />}
-			onClick={() => {
-				window.open(config.paramiWallet);
-			}}
-		>
-			{btnText}
-		</Button>
+	const openCreateAccountWindow = () => {
+		window.open(`${config.paramiWallet}/`, 'Parami Create DID', 'popup,width=400,height=600');
 	}
 
 	const openInstructionPopover = useCallback(() => {
@@ -56,13 +42,13 @@ const Advertisement: React.FC<{
 		<>
 			<div className='advertisementContainer'>
 				<div className='ownerInfo'>
-					<span>📢 This hyperlink NFT is reserved. The owner of it has not claimed it</span>
-					<a className='claimLink' href='https://app.parami.io/' target='_blank'>I am the owner</a>
+					<span>📢 This hyperlink NFT is reserved.</span>
+					<a className='claimLink' href={`${config.paramiWallet}`} target='_blank'>I am the owner</a>
 				</div>
 				<div className='sponsorInfo'>
 					{ad?.icon && <img referrerPolicy='no-referrer' className='sponsorIcon' src={ad?.icon}></img>}
 					<span className='sponsorText'>Parami is sponsoring this hyperlink NFT</span>
-					<div className='bidBtn' onClick={() => window.open('https://app.parami.io/dashboard')}>Bid it</div>
+					<div className='bidBtn' onClick={() => window.open(`${config.paramiWallet}/dashboard`)}>Bid it</div>
 				</div>
 				<img
 					src={ad?.media}
@@ -70,24 +56,30 @@ const Advertisement: React.FC<{
 					className='adMediaImg'
 				/>
 				<div className='adDescription'>
-					{/* todo: ad description */}
 					<span className='descriptionText'>{ad?.description ?? 'We are Gem_DAO, get gem with me everyday ❤️'}</span>
 					{tags?.length > 0 && <span className='tags'>
 						{tags.map((tag: string, index: number) => <span className='tag' key={index}>#{tag}</span>)}
 					</span>}
 				</div>
 				<div className='claimSection'>
-					<div className='infoText'>According to you DID Reputation Score you are rewarded:</div>
+					<div className='infoText'>According to your DID Reputation Score you are rewarded:</div>
 					<div className='rewardRow'>
 						<div className='rewardInfo'>
-							<img referrerPolicy='no-referrer' className='kolIcon' src={ad?.icon}></img>
+							<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
 							<span className='rewardAmount'>
-								300 Kaikang NFT Power
+								<span className='rewardNumber'>300</span>
+								<span className='rewardToken'>{ad?.assetName} NFT Power</span>
 							</span>
 						</div>
 						<div className='buttons'>
-							<div className='claimBtn btn' onClick={() => openClaimWindow()}>Claim Now</div>
-							<div className='instructionsBtn btn' onMouseEnter={openInstructionPopover} onMouseLeave={delayCloseInstructionPopover}>Get More Score</div>
+							{!!userDid && <>
+								<div className='claimBtn btn' onClick={() => openClaimWindow()}>Claim Now</div>
+								<div className='instructionsBtn btn' onMouseEnter={openInstructionPopover} onMouseLeave={delayCloseInstructionPopover}>Get More Score</div>
+							</>}
+
+							{!userDid && <>
+								<div className='createDidBtn btn' onClick={() => openCreateAccountWindow()}>Create DID and claim!</div>
+							</>}
 						</div>
 					</div>
 				</div>
@@ -98,7 +90,7 @@ const Advertisement: React.FC<{
 							{ad.instructions.map((instruction: any, index: number) => {
 								return (
 									<div className='instruction' onClick={() => {
-										!!instruction.link && window.open(`https://weekly.parami.io?redirect=${instruction.link}&nftId=${ad.nftId}&did=${ad.userDid}&ad=${ad.adId}&tag=${instruction.tag}&score=${instruction.score}`);
+										!!instruction.link && window.open(`https://weekly.parami.io?redirect=${instruction.link}&nftId=${ad.nftId}&did=${userDid}&ad=${ad.adId}&tag=${instruction.tag}&score=${instruction.score}`);
 									}}>
 										<span className='instructionText'>{instruction.text}</span>
 										<span className='instructionTag'>#{instruction.tag}</span>

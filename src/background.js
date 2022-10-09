@@ -25,7 +25,6 @@ chrome.storage.sync.set(
   });
 
   const fetchAd = async (nftId, did) => {
-    console.log('fetch ad', nftId, did);
     if (!nftId) {
       return null;
     }
@@ -67,7 +66,7 @@ chrome.storage.sync.set(
         nftId,
         insufficientBalance: ad.payoutMax && BigInt(deleteComma(balance.balance)) < BigInt(deleteComma(ad.payoutMax)),
         userDid: did,
-        tokenSymbol: asset.symbol ?? 'Token'
+        assetName: asset.name
       };
     } catch (e) {
       console.log(e);
@@ -75,6 +74,7 @@ chrome.storage.sync.set(
     }
   }
 
+  let twitterTabId;
   chrome.runtime.onMessage.addListener(
     (request, sender, sendResponse) => {
       if (request.method === 'fetchAd') {
@@ -86,6 +86,15 @@ chrome.storage.sync.set(
           });
         });
       }
+
+      if (request.method === 'openTwitterTab') {
+        twitterTabId = sender.tab.id;
+      }
+
+      if (request.method === 'didChange' && twitterTabId) {
+        chrome.tabs.sendMessage(twitterTabId, request);
+      }
+
       return true;
     }
   );

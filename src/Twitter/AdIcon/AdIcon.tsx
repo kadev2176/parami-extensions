@@ -17,8 +17,6 @@ function AdIcon({ href, ad }: AdIconProps) {
         ad ? <Advertisement ad={ad}></Advertisement> : null
     );
 
-    // todo: popover arrow display none
-    // todo: no ad no popover
     return <div className='pfp-link-badge-container'>
         <Popover content={content} placement="rightTop" className='ad-popover'>
             <a className='pfp-link-badge' target="_blank"
@@ -27,6 +25,11 @@ function AdIcon({ href, ad }: AdIconProps) {
                 <img referrerPolicy='no-referrer' src={ad?.icon ?? defaultAdIcon}></img>
             </a>
         </Popover>
+
+        {!!ad && <div className='priceInfo'>
+            <span className='price'>~37mAD3</span>
+            <span className='priceChange'>+120%</span>
+        </div>}
     </div>;
 };
 

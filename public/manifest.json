@@ -36,12 +36,8 @@
         "*://*.twitter.com/*"
       ],
       "run_at": "document_idle",
-      "js": [
-        "twitter.js"
-      ],
-      "css": [
-        "twitter.css"
-      ]
+      "js": [],
+      "css": []
     },
     {
       "matches": [

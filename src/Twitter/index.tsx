@@ -83,6 +83,7 @@ import 'antd/dist/antd.css';
         href = wnft2href.get(wnftUrl);
         if (href) {
           const adIconContainer = document.createElement('div');
+          adIconContainer.setAttribute('style', 'width: 100%; height:100%;')
           container.prepend(adIconContainer);
           const root = createRoot(adIconContainer);
 

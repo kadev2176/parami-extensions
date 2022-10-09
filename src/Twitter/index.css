@@ -15,3 +15,11 @@ code {
 .ant-popover-arrow {
   display: none !important;
 }
+
+.ant-popover-inner {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 6px -4px, rgba(0, 0, 0, 0.16) 0px 6px 16px, rgba(0, 0, 0, 0.1) 0px 9px 28px 8px;
+}
+
+.ant-popover-inner-content {
+  padding: 0 !important;
+}

@@ -1,127 +1,188 @@
 .advertisementContainer {
-  max-width: 300px;
+  max-width: 500px;
+  font-size: 12px;
 }
 
-.advertisementContainer .adCard {
-  background: hsla(0, 0%, 100%, .24);
-}
-
-.advertisement {
-  position: relative;
+.ownerInfo {
+  padding: 4px 12px;
+  background: #F8F8F8;
+  color: #746D6D;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
-.adMedia {
-  width: 100%;
-  margin-bottom: 5px;
+.smFont {
+  font-size: 12px;
+  transform: scale(0.666);
+  transform-origin: 0 center;
+  white-space: nowrap;
+}
+
+.sponsorInfo {
+  background: #EFEFEF;
+  padding: 4px 12px;
+  display: flex;
+  flex-direction: row;
+  color: #8E8E8E;
+  align-items: center;
+}
+
+.sponsorInfo .sponsorIcon {
+  width: 24px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.sponsorText {
+  flex-grow: 1;
+}
+
+.bidBtn {
+  background: #D9D9D9;
+  color: #3D3D3E;
+  height: 20px;
+  font-size: 14px;
+  line-height: 20px;
+  border-radius: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  cursor: pointer;
+}
+
+.bidBtn:hover {
+  background: #cccccc;
 }
 
 .adMediaImg {
   width: 100%;
-  border-radius: 4px;
   max-height: 60vh;
 }
 
-.instructions {
-  width: 100%;
-  padding-bottom: 5px;
-  font-size: 0.7rem;
+.adDescription {
+  background: #EFEFEF;
+  padding: 9px 12px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
-.instructionTitle {
-  font-weight: 500;
-  padding-bottom: 5px;
+.descriptionText {
+  margin-right: 4px;
 }
 
-.instruction {
-  border-radius: 4px;
-  padding: 5px;
+.adDescription .tags .tag {
+  margin-right: 5px;
+}
+
+.claimSection {
+  padding: 10px 12px;
+}
+
+.claimSection .infoText {
+  color: #717171;
   margin-bottom: 5px;
-  background: rgb(240, 245, 245);
+}
 
+.rewardRow {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
 }
 
-.instruction.withLink:hover {
+.rewardInfo {
+  display: flex;
+  flex-direction: row;
+}
+
+.rewardInfo .kolIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.rewardInfo .rewardAmount {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.rewardRow .buttons {
+  display: flex;
+}
+
+.rewardRow .buttons .btn {
+  background: #D9D9D9;
   cursor: pointer;
-  background: rgba(240, 245, 245, 0.6);
+  padding: 4px 10px;
 }
 
-.instructionText {
-  text-align: left;
-  flex-grow: 1;
+.rewardRow .buttons .btn:hover {
+  background: #cccccc;
 }
 
-.buttonContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.claimBtn {
+  border-radius: 13px 0 0 13px;
+  margin-right: 2px;
 }
 
-.ant-btn.ant-btn-primary.actionBtn {
-  font-size: 0.8rem;
-  width: fit-content;
-  margin-bottom: 0;
-  padding: 5px 10px;
-  height: 30px;
-  border-radius: 30px;
+.instructionsBtn {
+  border-radius: 0 13px 13px 0;
 }
 
-.container {
+.instructions {
+  padding: 10px;
+  position: relative;
+}
+
+.instructions .popoverContent {
+  background: #D9D9D9;
+  padding: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.instructions .instruction {
+  background: #F3F3F3;
+  cursor: pointer;
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  border-radius: 19px;
   align-items: center;
-  padding: 35px;
-  max-width: 1200px;
-  width: 100%;
-  margin-top: -50px;
+  padding: 4px 8px;
 }
 
-  .advertisement {
-    .cover {
-      .adMedia {
-        .adMediaImg {
-          max-height: 100vh !important;
-        }
-      }
-    }
-  }
+.instructions .instruction:hover {
+  background: #e6e6e6;
+}
 
-  .container {
-    width: 100%;
-    padding: 15px;
+.instructions .instruction+.instruction {
+  margin-top: 8px;
+}
 
-    .topBar {
-      .sponsored {
-        width: 100%;
-      }
-    }
-  }
+.instructions .instruction .instructionText {
+  flex-grow: 1;
+  color: #717171;
+}
 
-  .userCard {
-    width: 100%;
-    margin-top: 100px;
-    border-radius: 0 !important;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+.instructionTag {
+  margin-right: 4px;
+}
 
-    .user {
-      flex-direction: column;
+.instructionTag,
+.instructionScore {
+  font-size: 14px;
+  font-weight: 700;
+  color: #000000;
+}
 
-      .avatar {
-        margin-top: -100px;
-      }
-
-      .info {
-        margin-top: 20px;
-        margin-left: 0;
-      }
-    }
-  }
-} */
+.instructions .popoverArrow {
+  background: #D9D9D9;
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  transform: rotate(45deg);
+  left: 430px;
+  top: 0px;
+  z-index: 0;
+}

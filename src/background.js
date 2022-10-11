@@ -23,8 +23,11 @@ chrome.storage.sync.set(
   const provider = new WsProvider(config.socketServer);
   const api = await ApiPromise.create({
     provider,
-    rpc: config.rpc
+    // rpc: config.rpc,
+    runtime: config.runtime
   });
+
+  await api.isReady;
 
   const fetchAd = async (nftId, did) => {
     if (!nftId) {
@@ -63,6 +66,16 @@ chrome.storage.sync.set(
 
       // const value = await api.rpc.swap.drylySellTokens(deleteComma(tokenAssetId), '1'.padEnd(18, '0'));
       // const tokenPrice = value.toHuman();
+
+      let rewardAmount;
+      if (did) {
+        try {
+          let res = await api.call.adRuntimeApi.calReward(adId, nftId, did, null);
+          rewardAmount = res.toHuman();
+        } catch (e) {
+          console.log(e);
+        }
+      }
       
       return {
         ...adJson,
@@ -72,6 +85,7 @@ chrome.storage.sync.set(
         insufficientBalance: ad.payoutMax && BigInt(deleteComma(balance.balance)) < BigInt(deleteComma(ad.payoutMax)),
         userDid: did,
         assetName: asset.name,
+        rewardAmount
       };
     } catch (e) {
       console.log(e);

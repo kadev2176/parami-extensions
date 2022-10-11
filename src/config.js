@@ -226,5 +226,70 @@ export const config = {
       },
     },
   },
+  runtime: {
+    AccountNonceApi: [
+      {
+        methods: {
+          account_nonce: {
+            description: 'The API to query account nonce (aka transaction index)',
+            params: [
+              {
+                name: 'accountId',
+                type: 'AccountId'
+              }
+            ],
+            type: 'Index'
+          }
+        },
+        version: 3
+      }
+    ],
+    GrandpaApi: [
+      {
+        methods: {
+          current_set_id: {
+            description: 'Get current GRANDPA authority set id.',
+            params: [],
+            type: 'SetId'
+          },
+          grandpa_authorities: {
+            description: 'Get the current GRANDPA authorities and weights. This should not change except for when changes are scheduled and the corresponding delay has passed.',
+            params: [],
+            type: 'AuthorityList'
+          }
+        },
+        version: 3
+      }
+    ],
+    AdRuntimeApi: [
+      {
+        methods: {
+          cal_reward: {
+            description: 'pre calculate reward of this did, adId, nftId pair',
+            params: [
+              {
+                name: 'ad_id',
+                type: 'H256',
+              },
+              {
+                name: 'nft_id',
+                type: 'u32',
+              },
+              {
+                name: 'visitor',
+                type: 'H160',
+              },
+              {
+                name: 'referrer',
+                type: 'Option<H160>',
+              }
+            ],
+            type: 'u128'
+          }
+        },
+        version: 1
+      }
+    ]
+  }
 };
 export default config;

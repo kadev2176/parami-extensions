@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import { LINK_BADGE_CLASSNAME } from '../models';
+import { LINK_BADGE_CLASSNAME, NFT_RECOGNITION_ENDPOINT, PREFIX_WNFT } from '../models';
 import { fetchBin, solveBin, parseWnft, parseMetaLink, parseNftIdFromUrl } from '../utilities';
 import AdIcon from './AdIcon/AdIcon';
 import 'antd/dist/antd.css';
@@ -44,14 +44,22 @@ import 'antd/dist/antd.css';
 
         if (a.href.endsWith('/followers_you_follow')) continue;
 
-        const uri = new URL(avatar.src);
-        const ext = uri.pathname.split('.').at(-1);
-        const url = `${uri.origin}${uri.pathname
-          .split('_')
-          .slice(0, -1)
-          .join('_')}.${ext}`;
+        if (!imgUrl2Wnft.has(avatar.src)) {
+          const fetchNftResp = await fetch(`${NFT_RECOGNITION_ENDPOINT}?imageUrl=${avatar.src}`);
+          if (fetchNftResp.ok) {
+            const hnft = await fetchNftResp.json();
+            imgUrl2Wnft.set(avatar.src, `${PREFIX_WNFT}${hnft.contractAddress}?tokenId=${hnft.tokenId}`)
+          }
+        }
 
-        if (!imgUrl2Wnft.has(url)) {
+        if (!imgUrl2Wnft.has(avatar.src)) {
+          const uri = new URL(avatar.src);
+          const ext = uri.pathname.split('.').at(-1);
+          const url = `${uri.origin}${uri.pathname
+            .split('_')
+            .slice(0, -1)
+            .join('_')}.${ext}`;
+
           // eslint-disable-next-line no-await-in-loop
           const bin = await fetchBin(url);
           // eslint-disable-next-line no-await-in-loop
@@ -62,7 +70,7 @@ import 'antd/dist/antd.css';
           try {
             const wnft = parseWnft(img);
             if (wnft) {
-              imgUrl2Wnft.set(url, wnft);
+              imgUrl2Wnft.set(avatar.src, wnft);
             } else {
               continue;
             }
@@ -71,7 +79,7 @@ import 'antd/dist/antd.css';
           }
         }
 
-        const wnftUrl = imgUrl2Wnft.get(url);
+        const wnftUrl = imgUrl2Wnft.get(avatar.src);
 
         if (!wnftUrl) continue;
 
@@ -90,7 +98,7 @@ import 'antd/dist/antd.css';
           const nftId = parseNftIdFromUrl(href);
           if (nftId) {
             chrome.runtime.sendMessage({ method: 'fetchAd', nftId }, (response) => {
-              const { ad } = response;
+              const { ad } = response ?? {};
               root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} />);
             });
           } else {
@@ -101,14 +109,18 @@ import 'antd/dist/antd.css';
     }
   };
 
-  const observer = new MutationObserver(callback);
+  try {
+    const observer = new MutationObserver(callback);
 
-  observer.observe(document, {
-    subtree: true,
-    childList: true,
-  });
+    observer.observe(document, {
+      subtree: true,
+      childList: true,
+    });
+  } catch (e) {
+    console.log(e);
+  }
 
-  chrome.runtime.sendMessage({ method: 'openTwitterTab' });
+  // chrome.runtime.sendMessage({ method: 'openTwitterTab' });
 
   chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {

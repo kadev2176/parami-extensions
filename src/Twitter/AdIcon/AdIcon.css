@@ -12,6 +12,8 @@
   top: 0;
   width: 40%;
   height: 40%;
+  min-width: 20px;
+  min-height: 20px;
   z-index: 999;
   animation: opacity 0.5s linear;
   -webkit-animation: opacity 0.5s linear;
@@ -35,13 +37,13 @@
 }
 
 .priceInfo {
-  width: 100%;
+  width: fit-content;
   height: 32px;
   font-size: 12px;
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 100%;
+  top: 110%;
 }
 
 .priceInfo .price {
@@ -50,6 +52,7 @@
   transform: scale(0.9);
   transform-origin: 0px center;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .priceInfo .priceChange {

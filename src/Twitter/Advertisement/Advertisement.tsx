@@ -5,8 +5,7 @@ import config from '../../config';
 const Advertisement: React.FC<{
 	ad: any;
 	avatarSrc?: string;
-	userDid: string;
-}> = ({ ad, avatarSrc, userDid }) => {
+}> = ({ ad, avatarSrc }) => {
 
 	const [showInstructions, setShowInstructions] = useState<boolean>(false);
 	const [closePopoverTimeout, setClosePopoverTimeout] = useState<any>();
@@ -18,7 +17,7 @@ const Advertisement: React.FC<{
 	}
 
 	const openCreateAccountWindow = () => {
-		window.open(`${config.paramiWallet}/`, 'Parami Create DID', 'popup,width=400,height=600');
+		window.open(`${config.paramiWallet}/create/popup`, 'Parami Create DID', 'popup,width=400,height=600');
 	}
 
 	const openInstructionPopover = useCallback(() => {
@@ -42,13 +41,13 @@ const Advertisement: React.FC<{
 		<>
 			<div className='advertisementContainer'>
 				<div className='ownerInfo'>
-					<span>📢 This hyperlink NFT is reserved.</span>
+					<span>📢 This hNFT is reserved.</span>
 					<a className='claimLink' href={`${config.paramiWallet}`} target='_blank'>I am the owner</a>
 				</div>
 				<div className='sponsorInfo'>
 					{ad?.icon && <img referrerPolicy='no-referrer' className='sponsorIcon' src={ad?.icon}></img>}
-					<span className='sponsorText'>Parami is sponsoring this hyperlink NFT</span>
-					<div className='bidBtn' onClick={() => window.open(`${config.paramiWallet}/dashboard`)}>Bid it</div>
+					<span className='sponsorText'><span className='sponsorName'>{ad?.sponsorName ?? 'Parami'}</span>is sponsoring this hNFT</span>
+					<div className='bidBtn' onClick={() => window.open(`${config.paramiWallet}/dashboard`)}>BID</div>
 				</div>
 				<img
 					src={ad?.media}
@@ -56,33 +55,35 @@ const Advertisement: React.FC<{
 					className='adMediaImg'
 				/>
 				<div className='adDescription'>
-					<span className='descriptionText'>{ad?.description ?? 'We are Gem_DAO, get gem with me everyday ❤️'}</span>
+					<span className='descriptionText'>{ad?.description ?? 'View Ads. Get Paid.'}</span>
 					{tags?.length > 0 && <span className='tags'>
 						{tags.map((tag: string, index: number) => <span className='tag' key={index}>#{tag}</span>)}
 					</span>}
 				</div>
-				<div className='claimSection'>
-					<div className='infoText'>According to your DID Reputation Score you are rewarded:</div>
+
+				{!ad?.userDid && <div className='noDidSection'>
+					<div className='createDidBtn actionBtn' onClick={() => openCreateAccountWindow()}>Create DID and claim!</div>
+				</div>}
+
+				{!!ad?.userDid && <div className='claimSection'>
+					<div className='infoText'>Due to your Reputation Score you are rewarded:</div>
 					<div className='rewardRow'>
 						<div className='rewardInfo'>
 							<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
 							<span className='rewardAmount'>
-								<span className='rewardNumber'>300</span>
+								<span className='rewardNumber'>{ad?.rewardAmount ?? '300.00'}</span>
 								<span className='rewardToken'>{ad?.assetName} NFT Power</span>
 							</span>
 						</div>
 						<div className='buttons'>
-							{!!userDid && <>
-								<div className='claimBtn btn' onClick={() => openClaimWindow()}>Claim Now</div>
-								<div className='instructionsBtn btn' onMouseEnter={openInstructionPopover} onMouseLeave={delayCloseInstructionPopover}>Get More Score</div>
-							</>}
-
-							{!userDid && <>
-								<div className='createDidBtn btn' onClick={() => openCreateAccountWindow()}>Create DID and claim!</div>
-							</>}
+							<>
+								<div className='claimBtn actionBtn' onClick={() => openClaimWindow()}>Claim</div>
+								<div className='instructionsBtn actionBtn' onMouseEnter={openInstructionPopover} onMouseLeave={delayCloseInstructionPopover}>More Score</div>
+							</>
 						</div>
 					</div>
-				</div>
+				</div>}
+
 				{showInstructions && <div className='instructions' onMouseEnter={openInstructionPopover} onMouseLeave={delayCloseInstructionPopover}>
 					<div className='popoverArrow'></div>
 					<div className='popoverContent'>
@@ -90,7 +91,7 @@ const Advertisement: React.FC<{
 							{ad.instructions.map((instruction: any, index: number) => {
 								return (
 									<div className='instruction' onClick={() => {
-										!!instruction.link && window.open(`https://weekly.parami.io?redirect=${instruction.link}&nftId=${ad.nftId}&did=${userDid}&ad=${ad.adId}&tag=${instruction.tag}&score=${instruction.score}`);
+										!!instruction.link && window.open(`https://weekly.parami.io?redirect=${instruction.link}&nftId=${ad.nftId}&did=${ad?.userDid}&ad=${ad.adId}&tag=${instruction.tag}&score=${instruction.score}`);
 									}}>
 										<span className='instructionText'>{instruction.text}</span>
 										<span className='instructionTag'>#{instruction.tag}</span>

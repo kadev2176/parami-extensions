@@ -8,6 +8,7 @@
 import { NETWORK_MAINNET, NETWORK_TEST } from './models';
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
+// import { formatBalance } from '@polkadot/util';
 import { config } from './config';
 import { deleteComma } from './utilities';
 
@@ -21,7 +22,8 @@ chrome.storage.sync.set(
   await cryptoWaitReady();
   const provider = new WsProvider(config.socketServer);
   const api = await ApiPromise.create({
-    provider
+    provider,
+    rpc: config.rpc
   });
 
   const fetchAd = async (nftId, did) => {
@@ -59,6 +61,9 @@ chrome.storage.sync.set(
       const assetInfo = await api.query.assets.metadata(Number(deleteComma(tokenAssetId)));
       const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
 
+      // const value = await api.rpc.swap.drylySellTokens(deleteComma(tokenAssetId), '1'.padEnd(18, '0'));
+      // const tokenPrice = value.toHuman();
+      
       return {
         ...adJson,
         adId,
@@ -66,7 +71,7 @@ chrome.storage.sync.set(
         nftId,
         insufficientBalance: ad.payoutMax && BigInt(deleteComma(balance.balance)) < BigInt(deleteComma(ad.payoutMax)),
         userDid: did,
-        assetName: asset.name
+        assetName: asset.name,
       };
     } catch (e) {
       console.log(e);
@@ -87,13 +92,13 @@ chrome.storage.sync.set(
         });
       }
 
-      if (request.method === 'openTwitterTab') {
-        twitterTabId = sender.tab.id;
-      }
+      // if (request.method === 'openTwitterTab') {
+      //   twitterTabId = sender.tab.id;
+      // }
 
-      if (request.method === 'didChange' && twitterTabId) {
-        chrome.tabs.sendMessage(twitterTabId, request);
-      }
+      // if (request.method === 'didChange' && twitterTabId) {
+      //   chrome.tabs.sendMessage(twitterTabId, request);
+      // }
 
       return true;
     }

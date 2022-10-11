@@ -71,7 +71,7 @@ chrome.storage.sync.set(
       if (did) {
         try {
           let res = await api.call.adRuntimeApi.calReward(adId, nftId, did, null);
-          rewardAmount = res.toHuman();
+          rewardAmount = parseFloat(deleteComma(res.toHuman())).toFixed(2);
         } catch (e) {
           console.log(e);
         }

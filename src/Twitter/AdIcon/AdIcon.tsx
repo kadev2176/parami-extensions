@@ -26,7 +26,6 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
         return null;
     }
 
-    // todo: fix communication between content scripts
     useEffect(() => {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log('ad icon on message', request);

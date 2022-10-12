@@ -22,9 +22,9 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
         ad ? <Advertisement ad={ad} avatarSrc={avatarSrc} userDid={userDid} ></Advertisement> : null
     );
 
-    // if (ad?.adClaimed || ad?.insufficientBalance) {
-    //     return null;
-    // }
+    if (ad?.adClaimed) {
+        return null;
+    }
 
     // todo: fix communication between content scripts
     useEffect(() => {

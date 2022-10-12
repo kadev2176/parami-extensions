@@ -55,9 +55,6 @@ chrome.storage.sync.set(
 
       const adClaimed = did ? !(await api.query.ad.payout(adId, did)).isEmpty : false;
 
-      const balanceResp = await api.query.assets.account(Number(deleteComma(fractionId)), budgetPot);
-      const balance = balanceResp.isEmpty ? '0' : balanceResp.toHuman();
-
       const nftInfo = await api.query.nft.metadata(nftId);
       const tokenAssetId = nftInfo.isEmpty ? '' : (nftInfo.toHuman()).tokenAssetId;
 
@@ -72,7 +69,6 @@ chrome.storage.sync.set(
         adId,
         adClaimed,
         nftId,
-        insufficientBalance: ad.payoutMax && BigInt(deleteComma(balance.balance)) < BigInt(deleteComma(ad.payoutMax)),
         userDid: did,
         assetName: asset.name,
       };

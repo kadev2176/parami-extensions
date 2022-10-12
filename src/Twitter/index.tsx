@@ -120,7 +120,7 @@ import 'antd/dist/antd.css';
     console.log(e);
   }
 
-  // chrome.runtime.sendMessage({ method: 'openTwitterTab' });
+  chrome.runtime.sendMessage({ method: 'openTwitterTab' }, () => {});
 
   chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {

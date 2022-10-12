@@ -66,16 +66,6 @@ chrome.storage.sync.set(
 
       // const value = await api.rpc.swap.drylySellTokens(deleteComma(tokenAssetId), '1'.padEnd(18, '0'));
       // const tokenPrice = value.toHuman();
-
-      let rewardAmount;
-      if (did) {
-        try {
-          let res = await api.call.adRuntimeApi.calReward(adId, nftId, did, null);
-          rewardAmount = parseFloat(deleteComma(res.toHuman())).toFixed(2);
-        } catch (e) {
-          console.log(e);
-        }
-      }
       
       return {
         ...adJson,
@@ -85,12 +75,16 @@ chrome.storage.sync.set(
         insufficientBalance: ad.payoutMax && BigInt(deleteComma(balance.balance)) < BigInt(deleteComma(ad.payoutMax)),
         userDid: did,
         assetName: asset.name,
-        rewardAmount
       };
     } catch (e) {
       console.log(e);
       return null;
     }
+  }
+
+  const calReward = async (adId, nftId, did) => {
+    let res = await api.call.adRuntimeApi.calReward(adId, nftId, did, null);
+    return deleteComma(res.toHuman());
   }
 
   let twitterTabId;
@@ -106,13 +100,21 @@ chrome.storage.sync.set(
         });
       }
 
-      // if (request.method === 'openTwitterTab') {
-      //   twitterTabId = sender.tab.id;
-      // }
+      if (request.method === 'calReward') {
+        calReward(request.adId, request.nftId, request.did).then(rewardAmount => {
+          sendResponse({
+            rewardAmount
+          });
+        })
+      }
 
-      // if (request.method === 'didChange' && twitterTabId) {
-      //   chrome.tabs.sendMessage(twitterTabId, request);
-      // }
+      if (request.method === 'openTwitterTab') {
+        twitterTabId = sender.tab.id;
+      }
+
+      if (request.method === 'didChange' && twitterTabId) {
+        chrome.tabs.sendMessage(twitterTabId, request);
+      }
 
       return true;
     }

@@ -15,26 +15,27 @@ const defaultAdIcon = chrome.runtime.getURL('icons/logo-round-core.svg');
 
 function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
 
-    // const [userDid, setUserDid] = useState<string>(ad?.userDid);
+    const [userDid, setUserDid] = useState<string>(ad?.userDid);
     // const [tokenPrice, setTokenPrice] = useState<string>('');
 
     const content = (
-        ad ? <Advertisement ad={ad} avatarSrc={avatarSrc} ></Advertisement> : null
+        ad ? <Advertisement ad={ad} avatarSrc={avatarSrc} userDid={userDid} ></Advertisement> : null
     );
 
-    if (ad?.adClaimed || ad?.insufficientBalance) {
-        return null;
-    }
+    // if (ad?.adClaimed || ad?.insufficientBalance) {
+    //     return null;
+    // }
 
     // todo: fix communication between content scripts
-    // useEffect(() => {
-    //     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    //         if (request.method === 'didChange') {
-    //             setUserDid(request.didHex);
-    //         }
-    //         return true;
-    //     })
-    // }, []);
+    useEffect(() => {
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            console.log('ad icon on message', request);
+            if (request.method === 'didChange') {
+                setUserDid(request.didHex);
+            }
+            return true;
+        })
+    }, []);
 
     // useEffect(() => {
     //     const priceWithUnit = formatBalance(ad?.tokenPrice ?? '123400000000000000000', { withUnit: 'AD3', decimals: 18 });

@@ -1,16 +1,30 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import './Advertisement.css';
 import config from '../../config';
+import { formatBalance } from '@polkadot/util';
 
 const Advertisement: React.FC<{
 	ad: any;
 	avatarSrc?: string;
-}> = ({ ad, avatarSrc }) => {
+	userDid?: string;
+}> = ({ ad, avatarSrc, userDid }) => {
 
 	const [showInstructions, setShowInstructions] = useState<boolean>(false);
 	const [closePopoverTimeout, setClosePopoverTimeout] = useState<any>();
+	const [rewardAmount, setRewardAmount] = useState<string>('');
 
 	const tags = (ad?.instructions ?? []).map((instruction: any) => instruction.tag).filter(Boolean);
+
+	useEffect(() => {
+		chrome.runtime.sendMessage({ method: 'calReward', adId: ad.adId, nftId: ad.nftId, did: userDid }, (response) => {
+			const { rewardAmount } = response ?? {};
+
+			const amountWithUnit = formatBalance(rewardAmount, { withUnit: false, decimals: 18 });
+			const [price, unit] = amountWithUnit.split(' ');
+			const amount = `${parseFloat(price).toFixed(2)}${unit ? ` ${unit}` : ''}`;
+			setRewardAmount(amount);
+		});
+	}, [userDid])
 
 	const openClaimWindow = () => {
 		window.open(`${config.paramiWallet}/claim/${ad.adId}/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
@@ -61,17 +75,17 @@ const Advertisement: React.FC<{
 					</span>}
 				</div>
 
-				{!ad?.userDid && <div className='noDidSection'>
+				{!userDid && <div className='noDidSection'>
 					<div className='createDidBtn actionBtn' onClick={() => openCreateAccountWindow()}>Create DID and claim!</div>
 				</div>}
 
-				{!!ad?.userDid && <div className='claimSection'>
+				{!!userDid && <div className='claimSection'>
 					<div className='infoText'>Due to your Reputation Score you are rewarded:</div>
 					<div className='rewardRow'>
 						<div className='rewardInfo'>
 							<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
 							<span className='rewardAmount'>
-								<span className='rewardNumber'>{ad?.rewardAmount ?? '300.00'}</span>
+								<span className='rewardNumber'>{rewardAmount ?? '300.00'}</span>
 								<span className='rewardToken'>{ad?.assetName} NFT Power</span>
 							</span>
 						</div>
@@ -91,7 +105,7 @@ const Advertisement: React.FC<{
 							{ad.instructions.map((instruction: any, index: number) => {
 								return (
 									<div className='instruction' onClick={() => {
-										!!instruction.link && window.open(`https://weekly.parami.io?redirect=${instruction.link}&nftId=${ad.nftId}&did=${ad?.userDid}&ad=${ad.adId}&tag=${instruction.tag}&score=${instruction.score}`);
+										!!instruction.link && window.open(`https://weekly.parami.io?redirect=${instruction.link}&nftId=${ad.nftId}&did=${userDid}&ad=${ad.adId}&tag=${instruction.tag}&score=${instruction.score}`);
 									}}>
 										<span className='instructionText'>{instruction.text}</span>
 										<span className='instructionTag'>#{instruction.tag}</span>

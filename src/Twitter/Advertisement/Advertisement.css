@@ -1,0 +1,225 @@
+.advertisementContainer {
+  max-width: 300px;
+  font-size: 12px;
+  border: 1px solid #e4e4e4;
+}
+
+.ownerInfo {
+  padding: 4px 12px;
+  background: #F8F8F8;
+  color: #746D6D;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.smFont {
+  font-size: 12px;
+  transform: scale(0.666);
+  transform-origin: 0 center;
+  white-space: nowrap;
+}
+
+.sponsorInfo {
+  background: #EFEFEF;
+  padding: 4px 12px;
+  display: flex;
+  flex-direction: row;
+  color: #8E8E8E;
+  align-items: center;
+}
+
+.sponsorInfo .sponsorIcon {
+  width: 20px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.sponsorText {
+  flex-grow: 1;
+}
+
+.sponsorText .sponsorName {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.bidBtn {
+  color: rgb(15, 20, 25);
+  font-weight: 700;
+  background: #ffffff;
+  border: 1px solid rgb(207, 217, 222);
+
+  height: 20px;
+  font-size: 12px;
+  line-height: 20px;
+  border-radius: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  cursor: pointer;
+}
+
+.bidBtn:hover {
+  background: #cbcbcb;
+}
+
+.adMediaImg {
+  width: 100%;
+  max-height: 60vh;
+}
+
+.adDescription {
+  background: #EFEFEF;
+  padding: 9px 12px;
+}
+
+.descriptionText {
+  margin-right: 4px;
+}
+
+.adDescription .tags .tag {
+  font-size: 14px;
+  font-weight: 700;
+  margin-right: 5px;
+}
+
+.claimSection {
+  padding: 9px 12px;
+}
+
+.claimSection .infoText {
+  color: #939393;
+  margin-bottom: 5px;
+}
+
+.rewardRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rewardInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.rewardInfo .kolIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.rewardInfo .rewardAmount {
+  display: flex;
+  flex-direction: column;
+}
+
+.rewardInfo .rewardNumber {
+  font-size: 18px;
+  font-weight: 900;
+  margin-right: 4px;
+}
+
+.rewardInfo .rewardToken {
+  font-size: 12px;
+}
+
+.rewardRow .buttons {
+  display: flex;
+  font-size: 12px;
+  transform: scale(0.9);
+  transform-origin: 100% center;
+  white-space: nowrap;
+}
+
+.actionBtn {
+  color: #ffffff;
+  font-weight: 700;
+  background: rgb(15, 20, 25);
+  cursor: pointer;
+  padding: 4px 10px;
+}
+
+.actionBtn:hover {
+  background: rgba(15, 20, 25, 0.8);
+}
+
+.claimBtn {
+  border-radius: 13px 0 0 13px;
+  margin-right: 2px;
+}
+
+.instructionsBtn {
+  border-radius: 0 13px 13px 0;
+}
+
+.noDidSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px;
+}
+
+.createDidBtn {
+  border-radius: 13px;
+}
+
+.instructions {
+  padding: 10px;
+  position: relative;
+}
+
+.instructions .popoverContent {
+  background: #D9D9D9;
+  padding: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.instructions .instruction {
+  background: #F3F3F3;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  border-radius: 19px;
+  align-items: center;
+  padding: 4px 8px;
+}
+
+.instructions .instruction:hover {
+  background: #e6e6e6;
+}
+
+.instructions .instruction+.instruction {
+  margin-top: 8px;
+}
+
+.instructions .instruction .instructionText {
+  flex-grow: 1;
+  color: #717171;
+}
+
+.instructionTag {
+  margin-right: 4px;
+}
+
+.instructionTag,
+.instructionScore {
+  font-size: 14px;
+  font-weight: 700;
+  color: #000000;
+}
+
+.instructions .popoverArrow {
+  background: #D9D9D9;
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  transform: rotate(45deg);
+  left: 85%;
+  top: 0px;
+  z-index: 0;
+}

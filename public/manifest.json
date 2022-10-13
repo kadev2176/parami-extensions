@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Parami Hyperlink NFT Extension",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Enable Hyperlink for your HNFT profile photo.",
   "icons": {
     "16": "icons/icon_16.png",
@@ -28,8 +28,7 @@
   ],
   "host_permissions": [],
   "content_security_policy": {
-    "script-src": "self",
-    "object-src": "self"
+    "extension_pages": "script-src 'wasm-unsafe-eval' 'self'; object-src 'self'"
   },
   "content_scripts": [
     {
@@ -37,12 +36,8 @@
         "*://*.twitter.com/*"
       ],
       "run_at": "document_idle",
-      "js": [
-        "twitter.js"
-      ],
-      "css": [
-        "twitter.css"
-      ]
+      "js": [],
+      "css": []
     },
     {
       "matches": [

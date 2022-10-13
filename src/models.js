@@ -18,6 +18,8 @@ export const LINK_BADGE_CLASSNAME = 'pfp-link-badge';
 
 export const MULTI_JUMP_LIMIT = 5;
 
+export const NFT_RECOGNITION_ENDPOINT = 'https://airdrop.parami.io/nft-recognition/nfts';
+
 export const TYPE_ID_2_STRING = {
     '1': 'wnft',
     '2': 'did'

@@ -79,8 +79,9 @@ chrome.storage.sync.set(
   }
 
   const calReward = async (adId, nftId, did) => {
+    // FIX IT: The result of runtime api calReward is somehow 256 times of the correct value
     let res = await api.call.adRuntimeApi.calReward(adId, nftId, did, null);
-    return deleteComma(res.toHuman());
+    return (BigInt(deleteComma(res.toHuman())) / BigInt(256)).toString();
   }
 
   let twitterTabId;

@@ -17,23 +17,32 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
 
     const [userDid, setUserDid] = useState<string>(ad?.userDid);
     // const [tokenPrice, setTokenPrice] = useState<string>('');
+    const [adClaimed, setAdClaimed] = useState<boolean>(ad?.adClaimed);
 
     const content = (
         ad ? <Advertisement ad={ad} avatarSrc={avatarSrc} userDid={userDid} ></Advertisement> : null
     );
 
-    if (ad?.adClaimed) {
+    if (adClaimed) {
         return null;
     }
 
     useEffect(() => {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-            console.log('ad icon on message', request);
             if (request.method === 'didChange') {
                 setUserDid(request.didHex);
             }
             return true;
-        })
+        });
+
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.startsWith('AdClaimed:')) {
+                const adId = event.data.slice(10);
+                if (adId === ad?.adId) {
+                    setAdClaimed(true);
+                }
+            }
+        });
     }, []);
 
     // useEffect(() => {

@@ -56,7 +56,7 @@ const Advertisement: React.FC<{
 			<div className='advertisementContainer'>
 				<div className='ownerInfo'>
 					<span>📢 This hNFT is reserved.</span>
-					<a className='claimLink' href={`${config.paramiWallet}/claimHnft/${ad.nftId}`} target='_blank'>I am the owner</a>
+					<a className='claimLink' href={`${config.paramiWallet}/claim/hnft`} target='_blank'>I am the owner</a>
 				</div>
 				<div className='sponsorInfo'>
 					{ad?.icon && <img referrerPolicy='no-referrer' className='sponsorIcon' src={ad?.icon}></img>}

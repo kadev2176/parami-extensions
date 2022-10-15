@@ -18,6 +18,11 @@ chrome.storage.sync.set(
   },
 );
 
+const noAdResponse = {
+  success: true,
+  data: null
+};
+
 (async () => {
   await cryptoWaitReady();
   const provider = new WsProvider(config.socketServer);
@@ -31,22 +36,22 @@ chrome.storage.sync.set(
 
   const fetchAd = async (nftId, did) => {
     if (!nftId) {
-      return null;
+      return noAdResponse;
     }
 
     try {
       const slotResp = await api.query.ad.slotOf(nftId);
 
-      if (slotResp.isEmpty) return null;
+      if (slotResp.isEmpty) return noAdResponse;
 
       const { adId, budgetPot, fractionId } = slotResp.toHuman();
       const adResp = await api.query.ad.metadata(adId);
 
-      if (adResp.isEmpty) return null;
+      if (adResp.isEmpty) return noAdResponse;
 
       const ad = adResp.toHuman();
 
-      if (ad?.metadata?.indexOf('ipfs://') < 0) return null;
+      if (ad?.metadata?.indexOf('ipfs://') < 0) return noAdResponse;
 
       const hash = ad?.metadata?.substring(7);
 
@@ -63,18 +68,25 @@ chrome.storage.sync.set(
 
       // const value = await api.rpc.swap.drylySellTokens(deleteComma(tokenAssetId), '1'.padEnd(18, '0'));
       // const tokenPrice = value.toHuman();
-      
+
       return {
-        ...adJson,
-        adId,
-        adClaimed,
-        nftId,
-        userDid: did,
-        assetName: asset.name,
-      };
+        success: true,
+        data: {
+          ...adJson,
+          adId,
+          adClaimed,
+          nftId,
+          userDid: did,
+          assetName: asset.name,
+        }
+      }
     } catch (e) {
       console.log(e);
-      return null;
+      return {
+        success: false,
+        data: null,
+        nftId
+      };
     }
   }
 

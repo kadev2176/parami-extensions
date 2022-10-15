@@ -98,11 +98,11 @@ import 'antd/dist/antd.css';
           const nftId = parseNftIdFromUrl(href);
           if (nftId) {
             chrome.runtime.sendMessage({ method: 'fetchAd', nftId }, (response) => {
-              const { ad } = response ?? {};
+              const { ad } = response;
               root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} />);
             });
           } else {
-            root.render(<AdIcon href={href} />);
+            root.render(<AdIcon ad={{success: true, data: null}} href={href} />);
           }
         }
       }

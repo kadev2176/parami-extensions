@@ -7,31 +7,43 @@ import { formatBalance } from '@polkadot/util';
 
 export interface AdIconProps {
     href: string;
-    ad?: any;
+    ad: { success: boolean; data: any; nftId?: string };
     avatarSrc?: string;
+}
+
+const preload = (src: string) => {
+    if (src) {
+        const image = new Image();
+        image.referrerPolicy = 'no-referrer';
+        image.src = src;
+    }
 }
 
 const defaultAdIcon = chrome.runtime.getURL('icons/logo-round-core.svg');
 
 function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
-
-    const [userDid, setUserDid] = useState<string>(ad?.userDid);
     // const [tokenPrice, setTokenPrice] = useState<string>('');
-    const [adClaimed, setAdClaimed] = useState<boolean>(ad?.adClaimed);
+    const [adResult, setAdResult] = useState<any>(ad);
+    const [adData, setAdData] = useState<any>();
+    const [adClaimed, setAdClaimed] = useState<boolean>();
+    const [userDid, setUserDid] = useState<string>();
+
+    useEffect(() => {
+        if (adResult.success) {
+            setAdData(adResult.data);
+        } else {
+            // retry and then set adData
+            console.log('retrying ...');
+            chrome.runtime.sendMessage({ method: 'fetchAd', nftId: adResult.nftId }, (response) => {
+                const { ad } = response;
+                setAdResult(ad);
+            });
+        }
+    }, [adResult])
 
     const content = (
-        ad ? <Advertisement ad={ad} avatarSrc={avatarSrc} userDid={userDid} ></Advertisement> : null
+        adData ? <Advertisement ad={adData} avatarSrc={avatarSrc} userDid={userDid} ></Advertisement> : null
     );
-
-    const preload = (src: string) => {
-        if (src) {
-            const image = new Image();
-            image.referrerPolicy = 'no-referrer';
-            image.src = src;
-        }
-    }
-    preload(ad?.icon);
-    preload(ad?.media);
 
     if (adClaimed) {
         return null;
@@ -44,16 +56,23 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
             }
             return true;
         });
+    }, []);
 
+    useEffect(() => {
         window.addEventListener('message', (event) => {
             if (event.data && event.data.startsWith('AdClaimed:')) {
                 const adId = event.data.slice(10);
-                if (adId === ad?.adId) {
+                if (adId === adData?.adId) {
                     setAdClaimed(true);
                 }
             }
         });
-    }, []);
+
+        setAdClaimed(adData?.adClaimed);
+        setUserDid(adData?.userDid);
+        preload(adData?.icon);
+        preload(adData?.media);
+    }, [adData]);
 
     // useEffect(() => {
     //     const priceWithUnit = formatBalance(ad?.tokenPrice ?? '123400000000000000000', { withUnit: 'AD3', decimals: 18 });
@@ -67,7 +86,7 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
             <a className='pfp-link-badge' target="_blank"
                 href={href}
             >
-                <img referrerPolicy='no-referrer' src={ad?.icon ?? defaultAdIcon}></img>
+                <img referrerPolicy='no-referrer' src={adData?.icon ?? defaultAdIcon}></img>
             </a>
         </Popover>
 

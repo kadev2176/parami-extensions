@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import './AdIcon.css';
-import { Popover, Card, Image } from 'antd';
+import { Popover, Card } from 'antd';
 import { useState } from 'react';
 import Advertisement from '../Advertisement/Advertisement';
 import { formatBalance } from '@polkadot/util';
@@ -22,6 +22,16 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
     const content = (
         ad ? <Advertisement ad={ad} avatarSrc={avatarSrc} userDid={userDid} ></Advertisement> : null
     );
+
+    const preload = (src: string) => {
+        if (src) {
+            const image = new Image();
+            image.referrerPolicy = 'no-referrer';
+            image.src = src;
+        }
+    }
+    preload(ad?.icon);
+    preload(ad?.media);
 
     if (adClaimed) {
         return null;

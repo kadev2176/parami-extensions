@@ -21,22 +21,32 @@ const preload = (src: string) => {
 
 const defaultAdIcon = chrome.runtime.getURL('icons/logo-round-core.svg');
 
+const MAX_RETRY_COUNT = 3;
+
 function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
     // const [tokenPrice, setTokenPrice] = useState<string>('');
     const [adResult, setAdResult] = useState<any>(ad);
     const [adData, setAdData] = useState<any>();
     const [adClaimed, setAdClaimed] = useState<boolean>();
     const [userDid, setUserDid] = useState<string>();
+    const [retryCounter, setRetryCounter] = useState<number>(0);
+
+    const retry = (nftId: string) => {
+        if (retryCounter < MAX_RETRY_COUNT) {
+            setRetryCounter(retryCounter + 1);
+            // retry and then set adData
+            chrome.runtime.sendMessage({ method: 'fetchAd', nftId }, (response) => {
+                const { ad } = response;
+                setAdResult(ad);
+            });
+        }
+    }
 
     useEffect(() => {
         if (adResult.success) {
             setAdData(adResult.data);
         } else {
-            // retry and then set adData
-            chrome.runtime.sendMessage({ method: 'fetchAd', nftId: adResult.nftId }, (response) => {
-                const { ad } = response;
-                setAdResult(ad);
-            });
+            retry(adResult.nftId)
         }
     }, [adResult])
 

@@ -81,7 +81,7 @@ const Advertisement: React.FC<{
 				</div>}
 
 				{!!userDid && <div className='claimSection'>
-					<div className='infoText'>Due to your Reputation Score you are rewarded:</div>
+					<div className='infoText'>Due to your Preference Score you are rewarded:</div>
 					<div className='rewardRow'>
 						<div className='rewardInfo'>
 							<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>

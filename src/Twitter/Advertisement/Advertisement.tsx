@@ -12,6 +12,7 @@ const Advertisement: React.FC<{
 	const [showInstructions, setShowInstructions] = useState<boolean>(false);
 	const [closePopoverTimeout, setClosePopoverTimeout] = useState<any>();
 	const [rewardAmount, setRewardAmount] = useState<string>('');
+	const [claimText, setClaimText] = useState<string>('Not interested, claim it now');
 
 	const tags = (ad?.instructions ?? []).map((instruction: any) => instruction.tag).filter(Boolean);
 
@@ -91,8 +92,10 @@ const Advertisement: React.FC<{
 						</div>
 						<div className='buttons'>
 							<>
-								<div className='claimBtn actionBtn' onClick={() => openClaimWindow()}>Claim</div>
-								<div className='instructionsBtn actionBtn' onMouseEnter={openInstructionPopover} onMouseLeave={delayCloseInstructionPopover}>More Score</div>
+								<div className='claimBtn actionBtn' onMouseEnter={openInstructionPopover} onMouseLeave={delayCloseInstructionPopover}>Claim</div>
+								<div className='instructionsBtn actionBtn' onClick={() => {
+									window.open(`${config.paramiWallet}/swap/${ad.nftId}`);
+								}}>Buy more</div>
 							</>
 						</div>
 					</div>
@@ -101,11 +104,13 @@ const Advertisement: React.FC<{
 				{showInstructions && <div className='instructions' onMouseEnter={openInstructionPopover} onMouseLeave={delayCloseInstructionPopover}>
 					<div className='popoverArrow'></div>
 					<div className='popoverContent'>
+						<div className='instructionTitle'>Follow the tips below if you are interested</div>
 						{ad?.instructions?.length > 0 && <>
 							{ad.instructions.map((instruction: any, index: number) => {
 								return (
 									<div className='instruction' onClick={() => {
 										!!instruction.link && window.open(`https://weekly.parami.io?redirect=${instruction.link}&nftId=${ad.nftId}&did=${userDid}&ad=${ad.adId}&tag=${instruction.tag}&score=${instruction.score}`);
+										setClaimText('Claim');
 									}}>
 										<span className='instructionText'>{instruction.text}</span>
 										<span className='instructionTag'>#{instruction.tag}</span>
@@ -114,6 +119,9 @@ const Advertisement: React.FC<{
 								);
 							})}
 						</>}
+						<div className='instructionClaimBtnContainer'>
+							<div className='instructionClaimBtn actionBtn' onClick={() => openClaimWindow()}>{claimText}</div>
+						</div>
 					</div>
 				</div>}
 			</div>

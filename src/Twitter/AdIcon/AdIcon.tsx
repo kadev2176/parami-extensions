@@ -1,26 +1,57 @@
 import React, { useEffect } from 'react';
 import './AdIcon.css';
-import { Popover, Card, Image } from 'antd';
+import { Popover, Card } from 'antd';
 import { useState } from 'react';
 import Advertisement from '../Advertisement/Advertisement';
 import { formatBalance } from '@polkadot/util';
 
 export interface AdIconProps {
     href: string;
-    ad?: any;
+    ad: { success: boolean; data: any; nftId?: string };
     avatarSrc?: string;
+}
+
+const preload = (src: string) => {
+    if (src) {
+        const image = new Image();
+        image.referrerPolicy = 'no-referrer';
+        image.src = src;
+    }
 }
 
 const defaultAdIcon = chrome.runtime.getURL('icons/logo-round-core.svg');
 
-function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
+const MAX_RETRY_COUNT = 3;
 
-    const [userDid, setUserDid] = useState<string>(ad?.userDid);
+function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
     // const [tokenPrice, setTokenPrice] = useState<string>('');
-    const [adClaimed, setAdClaimed] = useState<boolean>(ad?.adClaimed);
+    const [adResult, setAdResult] = useState<any>(ad);
+    const [adData, setAdData] = useState<any>();
+    const [adClaimed, setAdClaimed] = useState<boolean>();
+    const [userDid, setUserDid] = useState<string>();
+    const [retryCounter, setRetryCounter] = useState<number>(0);
+
+    const retry = (nftId: string) => {
+        if (retryCounter < MAX_RETRY_COUNT) {
+            setRetryCounter(retryCounter + 1);
+            // retry and then set adData
+            chrome.runtime.sendMessage({ method: 'fetchAd', nftId }, (response) => {
+                const { ad } = response;
+                setAdResult(ad);
+            });
+        }
+    }
+
+    useEffect(() => {
+        if (adResult.success) {
+            setAdData(adResult.data);
+        } else {
+            retry(adResult.nftId)
+        }
+    }, [adResult])
 
     const content = (
-        ad ? <Advertisement ad={ad} avatarSrc={avatarSrc} userDid={userDid} ></Advertisement> : null
+        adData ? <Advertisement ad={adData} avatarSrc={avatarSrc} userDid={userDid} ></Advertisement> : null
     );
 
     if (adClaimed) {
@@ -34,16 +65,26 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
             }
             return true;
         });
+    }, []);
 
+    useEffect(() => {
         window.addEventListener('message', (event) => {
+            if (event.origin !== 'https://app.parami.io') {
+                return;
+            }
             if (event.data && event.data.startsWith('AdClaimed:')) {
                 const adId = event.data.slice(10);
-                if (adId === ad?.adId) {
+                if (adId === adData?.adId) {
                     setAdClaimed(true);
                 }
             }
         });
-    }, []);
+
+        setAdClaimed(adData?.adClaimed);
+        setUserDid(adData?.userDid);
+        preload(adData?.icon);
+        preload(adData?.media);
+    }, [adData]);
 
     // useEffect(() => {
     //     const priceWithUnit = formatBalance(ad?.tokenPrice ?? '123400000000000000000', { withUnit: 'AD3', decimals: 18 });
@@ -57,7 +98,7 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
             <a className='pfp-link-badge' target="_blank"
                 href={href}
             >
-                <img referrerPolicy='no-referrer' src={ad?.icon ?? defaultAdIcon}></img>
+                <img referrerPolicy='no-referrer' src={adData?.icon ?? defaultAdIcon}></img>
             </a>
         </Popover>
 

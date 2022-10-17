@@ -168,7 +168,7 @@
 }
 
 .instructions {
-  padding: 10px;
+  padding: 0 10px 10px 10px;
   position: relative;
 }
 
@@ -219,7 +219,32 @@
   height: 30px;
   position: absolute;
   transform: rotate(45deg);
-  left: 85%;
-  top: 0px;
+  left: 60%;
+  top: -10px;
   z-index: 0;
+}
+
+.instructionTitle {
+  margin-bottom: 5px;
+  color: rgba(0, 0, 0, 0.6)
+}
+
+.instructionClaimBtnContainer {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.instructionClaimBtn {
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 10px;
+  width: fit-content;
+  border-radius: 13px;
+  background: #ff5b00;
+}
+
+.instructionClaimBtn:hover {
+  background: #ff7c33;
 }

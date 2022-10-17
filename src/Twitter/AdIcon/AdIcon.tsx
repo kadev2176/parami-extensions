@@ -33,7 +33,6 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
             setAdData(adResult.data);
         } else {
             // retry and then set adData
-            console.log('retrying ...');
             chrome.runtime.sendMessage({ method: 'fetchAd', nftId: adResult.nftId }, (response) => {
                 const { ad } = response;
                 setAdResult(ad);
@@ -60,6 +59,9 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
 
     useEffect(() => {
         window.addEventListener('message', (event) => {
+            if (event.origin !== 'https://app.parami.io') {
+                return;
+            }
             if (event.data && event.data.startsWith('AdClaimed:')) {
                 const adId = event.data.slice(10);
                 if (adId === adData?.adId) {

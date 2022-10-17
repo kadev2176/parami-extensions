@@ -130,3 +130,15 @@ const noAdResponse = {
   );
 
 })();
+
+// detect tabs change
+chrome.tabs.onUpdated.addListener(
+  function(tabId, changeInfo, tab) {
+    console.log('tab change detected', tabId, changeInfo, tab);
+    if (changeInfo.url && changeInfo.url.startsWith('https://twitter.com')) {
+      chrome.tabs.sendMessage(tabId, {
+        method: 'urlChange'
+      });
+    }
+  }
+);

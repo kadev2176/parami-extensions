@@ -24,7 +24,8 @@
     "default_icon": "icons/icon_32.png"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "tabs"
   ],
   "host_permissions": [],
   "content_security_policy": {

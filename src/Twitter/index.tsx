@@ -1,7 +1,8 @@
+///<reference types="chrome"/>
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import { LINK_BADGE_CLASSNAME, NFT_RECOGNITION_ENDPOINT, PREFIX_WNFT } from '../models';
+import { AD_ICON_CONTAINER_CLASSNAME, NFT_RECOGNITION_ENDPOINT, PREFIX_WNFT } from '../models';
 import { fetchBin, solveBin, parseWnft, parseMetaLink, parseNftIdFromUrl } from '../utilities';
 import AdIcon from './AdIcon/AdIcon';
 import 'antd/dist/antd.css';
@@ -21,8 +22,9 @@ import 'antd/dist/antd.css';
 
       if (
         mutation.addedNodes.length === 1 &&
-        mutation.addedNodes[0].className === LINK_BADGE_CLASSNAME
+        mutation.addedNodes[0].className === AD_ICON_CONTAINER_CLASSNAME
       ) {
+        console.log('mutation skipping', AD_ICON_CONTAINER_CLASSNAME);
         return;
       }
     }
@@ -40,7 +42,15 @@ import 'antd/dist/antd.css';
 
         const container = a.parentElement!.parentElement!;
 
-        if (container.querySelector(`.${LINK_BADGE_CLASSNAME}`)) continue;
+        const adIconContainerDiv = container.querySelector(`.${AD_ICON_CONTAINER_CLASSNAME}`);
+        if (adIconContainerDiv) {
+          if (!a.href.endsWith('/photo')) {
+            console.log('loop avatar skipping', AD_ICON_CONTAINER_CLASSNAME, adIconContainerDiv);
+            continue;
+          }
+          console.log('loop avatar Removing /photo');
+          adIconContainerDiv.remove();
+        }
 
         if (a.href.endsWith('/followers_you_follow')) continue;
 
@@ -91,7 +101,8 @@ import 'antd/dist/antd.css';
         href = wnft2href.get(wnftUrl);
         if (href) {
           const adIconContainer = document.createElement('div');
-          adIconContainer.setAttribute('style', 'width: 100%; height:100%;')
+          adIconContainer.setAttribute('style', 'width: 100%; height:100%;');
+          adIconContainer.setAttribute('class', AD_ICON_CONTAINER_CLASSNAME);
           container.prepend(adIconContainer);
           const root = createRoot(adIconContainer);
 
@@ -125,7 +136,8 @@ import 'antd/dist/antd.css';
   chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
       // listen for messages sent from background.js
-      if (request.message === 'UrlChange') {
+      if (request.method === 'urlChange') {
+        console.log('Got url change. Clear cache.');
         // clear cache
         nodeMap.clear();
         imgUrl2Wnft.clear();

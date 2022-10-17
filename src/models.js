@@ -14,7 +14,7 @@ export const PREFIX_WNFT = 'wnft://';
 
 export const PREFIX_DID = 'did://';
 
-export const LINK_BADGE_CLASSNAME = 'pfp-link-badge';
+export const AD_ICON_CONTAINER_CLASSNAME = 'ad-icon-container';
 
 export const MULTI_JUMP_LIMIT = 5;
 

@@ -31,11 +31,11 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
     const [userDid, setUserDid] = useState<string>();
     const [retryCounter, setRetryCounter] = useState<number>(0);
 
-    const retry = (nftId: string) => {
+    const retry = (adInfo: {nftId?: string; contractAddress?: string; tokenId?: string}) => {
         if (retryCounter < MAX_RETRY_COUNT) {
             setRetryCounter(retryCounter + 1);
             // retry and then set adData
-            chrome.runtime.sendMessage({ method: 'fetchAd', nftId }, (response) => {
+            chrome.runtime.sendMessage({ method: 'fetchAd', adInfo }, (response) => {
                 const { ad } = response;
                 setAdResult(ad);
             });
@@ -46,7 +46,7 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
         if (adResult.success) {
             setAdData(adResult.data);
         } else {
-            retry(adResult.nftId)
+            retry(adResult.adInfo)
         }
     }, [adResult])
 

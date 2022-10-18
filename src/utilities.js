@@ -264,15 +264,15 @@ export const fetchBin = async url => {
     const res = await fetch(url);
     const bin = await res.blob();
     return bin;
-  }
+}
 
 export const solveBin = bin => {
     return new Promise(resolve => {
-      const img = new Image();
-      img.src = URL.createObjectURL(bin);
-      img.onload = () => resolve(img);
+        const img = new Image();
+        img.src = URL.createObjectURL(bin);
+        img.onload = () => resolve(img);
     });
-  }
+}
 
 export const parseWnft = image => {
     const imageData = parse(image);
@@ -298,12 +298,12 @@ export const parseWnft = image => {
 }
 
 export const fromHexString = (hexString) => {
-    if(hexString === null) {
+    if (hexString === null) {
         return new Uint8Array(0);
     }
-    let tmp=hexString;
-    if(hexString.indexOf('0x') === 0) {
-        tmp=hexString.substring(2);
+    let tmp = hexString;
+    if (hexString.indexOf('0x') === 0) {
+        tmp = hexString.substring(2);
     }
     const matches = tmp.match(/.{1,2}/g);
     if (matches === null) throw new Error('Invalid hex string');
@@ -373,17 +373,35 @@ export const parseMetaLink = async (metaLink, jumps) => {
     }
 }
 
-export const parseNftIdFromUrl = (url) => {
-    if (!url.startsWith('https://app.parami.io/did:ad3:')) {
-        return null;
+export const parseAdInfoFromUrl = (url) => {
+    if (url.startsWith('https://app.parami.io/did:ad3:')) {
+        const nftId = parseInt(url.substring(30).split('/')[1], 10);
+        if (isNaN(nftId)) {
+            return {
+                isParamiAd: false
+            };
+        }
+        return {
+            isParamiAd: true,
+            nftId: nftId.toString()
+        }
     }
 
-    const nftId = parseInt(url.substring(30).split('/')[1], 10);
-    if (isNaN(nftId)) {
-        return null;
+    // https://app.parami.io/hnft/ethereum/0xe4ecf7318833d0f10a5f11de447e9194d9ad94ac/6187
+    if (url.startsWith('https://app.parami.io/hnft/ethereum/')) {
+        const [contractAddress, tokenId] = url.slice(36).split('/');
+        if (contractAddress && tokenId) {
+            return {
+                isParamiAd: true,
+                contractAddress,
+                tokenId
+            }
+        }
     }
     
-    return nftId.toString();
+    return {
+        isParamiAd: false
+    };
 }
 
 export const deleteComma = (value) => {

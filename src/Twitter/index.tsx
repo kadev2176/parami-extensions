@@ -3,7 +3,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import { AD_ICON_CONTAINER_CLASSNAME, NFT_RECOGNITION_ENDPOINT, PREFIX_WNFT } from '../models';
-import { fetchBin, solveBin, parseWnft, parseMetaLink, parseNftIdFromUrl } from '../utilities';
+import { fetchBin, solveBin, parseWnft, parseMetaLink, parseAdInfoFromUrl } from '../utilities';
 import AdIcon from './AdIcon/AdIcon';
 import 'antd/dist/antd.css';
 
@@ -106,9 +106,10 @@ import 'antd/dist/antd.css';
           container.prepend(adIconContainer);
           const root = createRoot(adIconContainer);
 
-          const nftId = parseNftIdFromUrl(href);
-          if (nftId) {
-            chrome.runtime.sendMessage({ method: 'fetchAd', nftId }, (response) => {
+          const adInfo = parseAdInfoFromUrl(href);
+
+          if (adInfo.isParamiAd) {
+            chrome.runtime.sendMessage({ method: 'fetchAd', adInfo }, (response) => {
               const { ad } = response;
               root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} />);
             });

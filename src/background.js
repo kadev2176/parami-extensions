@@ -34,13 +34,27 @@ const noAdResponse = {
 
   await api.isReady;
 
-  const fetchAd = async (nftId, did) => {
-    if (!nftId) {
+  const fetchAd = async (adInfo, did) => {
+    if (!adInfo.nftId) {
+      if (!adInfo.contractAddress || !adInfo.tokenId) {
+        return noAdResponse;
+      }
+
+      const nftIdResp = await api.query.nft.ported('Ethereum', adInfo.contractAddress, adInfo.tokenId);
+      
+      if (nftIdResp.isEmpty) {
+        return noAdResponse;
+      }
+
+      adInfo.nftId = deleteComma(nftIdResp.toHuman());
+    }
+
+    if (!adInfo.nftId) {
       return noAdResponse;
     }
 
     try {
-      const slotResp = await api.query.ad.slotOf(nftId);
+      const slotResp = await api.query.ad.slotOf(adInfo.nftId);
 
       if (slotResp.isEmpty) return noAdResponse;
 
@@ -60,7 +74,7 @@ const noAdResponse = {
 
       const adClaimed = did ? !(await api.query.ad.payout(adId, did)).isEmpty : false;
 
-      const nftInfo = await api.query.nft.metadata(nftId);
+      const nftInfo = await api.query.nft.metadata(adInfo.nftId);
       const tokenAssetId = nftInfo.isEmpty ? '' : (nftInfo.toHuman()).tokenAssetId;
 
       const assetInfo = await api.query.assets.metadata(Number(deleteComma(tokenAssetId)));
@@ -75,7 +89,7 @@ const noAdResponse = {
           ...adJson,
           adId,
           adClaimed,
-          nftId,
+          nftId: adInfo.nftId,
           userDid: did,
           assetName: asset.name,
         }
@@ -85,7 +99,7 @@ const noAdResponse = {
       return {
         success: false,
         data: null,
-        nftId
+        adInfo
       };
     }
   }
@@ -101,7 +115,7 @@ const noAdResponse = {
     (request, sender, sendResponse) => {
       if (request.method === 'fetchAd') {
         chrome.storage.sync.get(['didHex'], res => {
-          fetchAd(request.nftId, res?.didHex).then(ad => {
+          fetchAd(request.adInfo, res?.didHex).then(ad => {
             sendResponse({
               ad
             });

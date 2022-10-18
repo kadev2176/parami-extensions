@@ -100,6 +100,9 @@ import 'antd/dist/antd.css';
         }
         href = wnft2href.get(wnftUrl);
         if (href) {
+          if (container.querySelector(`.${AD_ICON_CONTAINER_CLASSNAME}`)) {
+            continue;
+          }
           const adIconContainer = document.createElement('div');
           adIconContainer.setAttribute('style', 'width: 100%; height:100%;');
           adIconContainer.setAttribute('class', AD_ICON_CONTAINER_CLASSNAME);

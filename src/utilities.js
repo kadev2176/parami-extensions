@@ -387,7 +387,6 @@ export const parseAdInfoFromUrl = (url) => {
         }
     }
 
-    // https://app.parami.io/hnft/ethereum/0xe4ecf7318833d0f10a5f11de447e9194d9ad94ac/6187
     if (url.startsWith('https://app.parami.io/hnft/ethereum/')) {
         const [contractAddress, tokenId] = url.slice(36).split('/');
         if (contractAddress && tokenId) {

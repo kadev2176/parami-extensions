@@ -61,7 +61,8 @@ const Advertisement: React.FC<{
 				</div>
 				<div className='sponsorInfo'>
 					{ad?.icon && <img referrerPolicy='no-referrer' className='sponsorIcon' src={ad?.icon}></img>}
-					<span className='sponsorText'><span className='sponsorName'>{ad?.sponsorName ?? 'Parami'}</span>is sponsoring this hNFT</span>
+					{/* todo: temporarily slice sponsor name. change to new ui later */}
+					<span className='sponsorText'><span className='sponsorName'>{`${(ad?.sponsorName ?? 'Parami').slice(0, 30)}`}</span>is sponsoring this hNFT</span>
 					<div className='bidBtn' onClick={() => window.open(`${config.paramiWallet}/bid/${ad.nftId}`)}>BID</div>
 				</div>
 				<img

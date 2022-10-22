@@ -20,6 +20,19 @@
   white-space: nowrap;
 }
 
+.bidSection {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.bidSection .kolIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin: 10px;
+}
+
 .sponsorInfo {
   background: #EFEFEF;
   padding: 4px 12px;
@@ -61,6 +74,10 @@
 
 .bidBtn:hover {
   background: #cbcbcb;
+}
+
+.claimLink {
+  margin-left: 5px;
 }
 
 .adMediaImg {

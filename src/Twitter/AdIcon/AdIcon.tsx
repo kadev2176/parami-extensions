@@ -31,7 +31,7 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
     const [userDid, setUserDid] = useState<string>();
     const [retryCounter, setRetryCounter] = useState<number>(0);
 
-    const retry = (adInfo: {nftId?: string; contractAddress?: string; tokenId?: string}) => {
+    const retry = (adInfo: { nftId?: string; contractAddress?: string; tokenId?: string }) => {
         if (retryCounter < MAX_RETRY_COUNT) {
             setRetryCounter(retryCounter + 1);
             // retry and then set adData
@@ -94,13 +94,23 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
     // }, [ad])
 
     return <div className='pfp-link-badge-container'>
-        <Popover content={content} placement="rightTop" className='ad-popover'>
-            <a className='pfp-link-badge' target="_blank"
+        {!content && <>
+            <a className='pfp-link-badge pure-link' target="_blank"
                 href={href}
             >
-                <img referrerPolicy='no-referrer' src={adData?.icon ?? defaultAdIcon}></img>
+                <i className="fa-solid fa-square-arrow-up-right"></i>
             </a>
-        </Popover>
+        </>}
+
+        {content && <>
+            <Popover content={content} placement="rightTop" className='ad-popover'>
+                <span className={`pfp-link-badge ${adData?.adId ? '' : 'default-icon'}`}>
+                    {adData?.adId && <img referrerPolicy='no-referrer' src={adData?.icon ?? defaultAdIcon}></img>}
+                    {!adData?.adId && <i className="fa-solid fa-heart"></i>}
+                </span>
+            </Popover>
+        </>}
+
 
         {/* {!!tokenPrice && <div className='priceInfo'>
             <span className='price'>{tokenPrice}</span>

@@ -5,11 +5,10 @@ import { formatBalance } from '@polkadot/util';
 
 const Advertisement: React.FC<{
 	ad: any;
+	claimed: boolean;
 	avatarSrc?: string;
 	userDid?: string;
-}> = ({ ad, avatarSrc, userDid }) => {
-
-	const [showInstructions, setShowInstructions] = useState<boolean>(false);
+}> = ({ ad, avatarSrc, userDid, claimed }) => {
 	const [closePopoverTimeout, setClosePopoverTimeout] = useState<any>();
 	const [rewardAmount, setRewardAmount] = useState<string>('');
 	const [claimText, setClaimText] = useState<string>('Not interested, claim it now');
@@ -62,7 +61,7 @@ const Advertisement: React.FC<{
 					</div>
 					<div className='bidSection'>
 						<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
-						<a href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">Advertise on this HNFT</a>
+						<a href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">Sponsor this HNFT</a>
 					</div>
 				</>}
 
@@ -73,20 +72,29 @@ const Advertisement: React.FC<{
 					</div>
 					<div className='sponsorInfo'>
 						{ad?.icon && <img referrerPolicy='no-referrer' className='sponsorIcon' src={ad?.icon}></img>}
-						{/* todo: temporarily slice sponsor name. change to new ui later */}
-						<span className='sponsorText'><span className='sponsorName'>{`${(ad?.sponsorName ?? 'Parami').slice(0, 30)}`}</span>is sponsoring this hNFT</span>
-						<div className='bidBtn' onClick={() => window.open(`${config.paramiWallet}/bid/${ad.nftId}`)}>BID</div>
+						<span className='sponsorText'>
+							<span className='sponsorName'>
+								{`${ad?.sponsorName ?? 'Parami'}`}
+							</span>
+							is sponsoring this hNFT.
+							<a className='bidLink' href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">I want to bid</a>
+						</span>
 					</div>
-					<img
-						src={ad?.media}
-						referrerPolicy='no-referrer'
-						className='adMediaImg'
-					/>
-					<div className='adDescription'>
-						<span className='descriptionText'>{ad?.description ?? 'View Ads. Get Paid.'}</span>
-						{tags?.length > 0 && <span className='tags'>
-							{tags.map((tag: string, index: number) => <span className='tag' key={index}>#{tag}</span>)}
-						</span>}
+					<div className='adSection'>
+						<div className='adSectionArrow'></div>
+						<div className='adContent'>
+							<div className='adDescription'>
+								<span className='descriptionText'>{ad?.content ?? ad?.description ?? 'View Ads. Get Paid.'}</span>
+								{tags?.length > 0 && <span className='tags'>
+									{tags.map((tag: string, index: number) => <span className='tag' key={index}>#{tag}</span>)}
+								</span>}
+							</div>
+							<img
+								src={ad?.media}
+								referrerPolicy='no-referrer'
+								className='adMediaImg'
+							/>
+						</div>
 					</div>
 
 					{!userDid && <div className='noDidSection'>
@@ -94,7 +102,10 @@ const Advertisement: React.FC<{
 					</div>}
 
 					{!!userDid && <div className='claimSection'>
-						<div className='infoText'>Due to your Preference Score you are rewarded:</div>
+						<div className='infoText'>{
+							!claimed ? 'Due to your Preference Score you are rewarded:' : 'You have already claimed:'
+						}</div>
+
 						<div className='rewardRow'>
 							<div className='rewardInfo'>
 								<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
@@ -103,39 +114,39 @@ const Advertisement: React.FC<{
 									<span className='rewardToken'>{ad?.assetName} NFT Power</span>
 								</span>
 							</div>
-							<div className='buttons'>
+							{/* <div className='buttons'>
 								<>
 									<div className='claimBtn actionBtn' onMouseEnter={openInstructionPopover} onMouseLeave={delayCloseInstructionPopover}>Claim</div>
 									<div className='instructionsBtn actionBtn' onClick={() => {
 										window.open(`${config.paramiWallet}/swap/${ad.nftId}`);
 									}}>Buy more</div>
 								</>
-							</div>
+							</div> */}
 						</div>
-					</div>}
 
-					{showInstructions && <div className='instructions' onMouseEnter={openInstructionPopover} onMouseLeave={delayCloseInstructionPopover}>
-						<div className='popoverArrow'></div>
-						<div className='popoverContent'>
-							<div className='instructionTitle'>Follow the tips below if you are interested</div>
+						{!claimed && <>
 							{ad?.instructions?.length > 0 && <>
-								{ad.instructions.map((instruction: any, index: number) => {
-									return (
-										<div className='instruction' onClick={() => {
-											!!instruction.link && window.open(`https://weekly.parami.io?redirect=${instruction.link}&nftId=${ad.nftId}&did=${userDid}&ad=${ad.adId}&tag=${instruction.tag}&score=${instruction.score}`);
-											setClaimText('Claim');
-										}}>
-											<span className='instructionText'>{instruction.text}</span>
-											<span className='instructionTag'>#{instruction.tag}</span>
-											<span className='instructionScore'>+{instruction.score}</span>
-										</div>
-									);
-								})}
+								<div className='instructionSection'>
+									<div className='instructionTitle'>Follow the tips below if you are interested</div>
+									{ad.instructions.map((instruction: any, index: number) => {
+										return (
+											<div className='instruction' onClick={() => {
+												!!instruction.link && window.open(`https://weekly.parami.io?redirect=${instruction.link}&nftId=${ad.nftId}&did=${userDid}&ad=${ad.adId}&tag=${instruction.tag}&score=${instruction.score}`);
+												setClaimText('Claim');
+											}} key={index}>
+												<span className='instructionText'>{instruction.text}</span>
+												<span className='instructionTag'>#{instruction.tag}</span>
+												<span className='instructionScore'>+{instruction.score}</span>
+											</div>
+										);
+									})}
+								</div>
 							</>}
+
 							<div className='instructionClaimBtnContainer'>
 								<div className='instructionClaimBtn actionBtn' onClick={() => openClaimWindow()}>{claimText}</div>
 							</div>
-						</div>
+						</>}
 					</div>}
 				</>}
 

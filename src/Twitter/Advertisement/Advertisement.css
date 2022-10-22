@@ -34,7 +34,8 @@
 }
 
 .sponsorInfo {
-  background: #EFEFEF;
+  background: #ffffff;
+  /* background: #EFEFEF; */
   padding: 4px 12px;
   display: flex;
   flex-direction: row;
@@ -46,6 +47,10 @@
   width: 20px;
   border-radius: 50%;
   margin-right: 4px;
+}
+
+.bidLink {
+  float: right;
 }
 
 .sponsorText {
@@ -78,6 +83,25 @@
 
 .claimLink {
   margin-left: 5px;
+}
+
+.adSection {
+  position: relative;
+}
+
+.adSectionArrow {
+  background: #EFEFEF;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  transform: rotate(45deg);
+  left: 12px;
+  top: -5px;
+  z-index: 0;
+}
+.adContent {
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .adMediaImg {
@@ -197,7 +221,7 @@
   z-index: 1;
 }
 
-.instructions .instruction {
+.instructionSection .instruction {
   background: #F3F3F3;
   cursor: pointer;
   display: flex;
@@ -207,15 +231,15 @@
   padding: 4px 8px;
 }
 
-.instructions .instruction:hover {
+.instructionSection .instruction:hover {
   background: #e6e6e6;
 }
 
-.instructions .instruction+.instruction {
+.instructionSection .instruction+.instruction {
   margin-top: 8px;
 }
 
-.instructions .instruction .instructionText {
+.instructionSection .instruction .instructionText {
   flex-grow: 1;
   color: #717171;
 }
@@ -244,7 +268,7 @@
 
 .instructionTitle {
   margin-bottom: 5px;
-  color: rgba(0, 0, 0, 0.6)
+  color: #939393;
 }
 
 .instructionClaimBtnContainer {

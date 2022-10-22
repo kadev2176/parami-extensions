@@ -27,7 +27,7 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
     // const [tokenPrice, setTokenPrice] = useState<string>('');
     const [adResult, setAdResult] = useState<any>(ad);
     const [adData, setAdData] = useState<any>();
-    const [adClaimed, setAdClaimed] = useState<boolean>();
+    const [adClaimed, setAdClaimed] = useState<boolean>(false);
     const [userDid, setUserDid] = useState<string>();
     const [retryCounter, setRetryCounter] = useState<number>(0);
 
@@ -51,12 +51,8 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
     }, [adResult])
 
     const content = (
-        adData ? <Advertisement ad={adData} avatarSrc={avatarSrc} userDid={userDid} ></Advertisement> : null
+        adData ? <Advertisement ad={adData} avatarSrc={avatarSrc} userDid={userDid} claimed={adClaimed} ></Advertisement> : null
     );
-
-    if (adClaimed) {
-        return null;
-    }
 
     useEffect(() => {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

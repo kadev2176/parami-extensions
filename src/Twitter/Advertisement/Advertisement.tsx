@@ -9,7 +9,6 @@ const Advertisement: React.FC<{
 	avatarSrc?: string;
 	userDid?: string;
 }> = ({ ad, avatarSrc, userDid, claimed }) => {
-	const [closePopoverTimeout, setClosePopoverTimeout] = useState<any>();
 	const [rewardAmount, setRewardAmount] = useState<string>('');
 	const [claimText, setClaimText] = useState<string>('Not interested, claim it now');
 
@@ -32,23 +31,6 @@ const Advertisement: React.FC<{
 
 	const openCreateAccountWindow = () => {
 		window.open(`${config.paramiWallet}/create/popup`, 'Parami Create DID', 'popup,width=400,height=600');
-	}
-
-	const openInstructionPopover = useCallback(() => {
-		// clear timeout
-		if (closePopoverTimeout) {
-			clearTimeout(closePopoverTimeout);
-			setClosePopoverTimeout(null);
-		}
-		// open popover
-		setShowInstructions(true);
-	}, [closePopoverTimeout]);
-
-	const delayCloseInstructionPopover = () => {
-		const timeout = setTimeout(() => {
-			setShowInstructions(false);
-		}, 200);
-		setClosePopoverTimeout(timeout);
 	}
 
 	return (

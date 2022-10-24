@@ -9,6 +9,7 @@ export interface AdIconProps {
     href: string;
     ad: { success: boolean; data: any; nftId?: string };
     avatarSrc?: string;
+    largeIcon: boolean;
 }
 
 const preload = (src: string) => {
@@ -23,7 +24,7 @@ const defaultAdIcon = chrome.runtime.getURL('icons/logo-round-core.svg');
 
 const MAX_RETRY_COUNT = 3;
 
-function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
+function AdIcon({ href, ad, avatarSrc, largeIcon }: AdIconProps) {
     // const [tokenPrice, setTokenPrice] = useState<string>('');
     const [adResult, setAdResult] = useState<any>(ad);
     const [adData, setAdData] = useState<any>();
@@ -91,7 +92,7 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
 
     return <div className='pfp-link-badge-container'>
         {!content && <>
-            <a className='pfp-link-badge pure-link' target="_blank"
+            <a className={`pfp-link-badge pure-link ${largeIcon ? 'large-icon' : ''}`} target="_blank"
                 href={href}
             >
                 <i className="fa-solid fa-square-arrow-up-right"></i>
@@ -100,11 +101,10 @@ function AdIcon({ href, ad, avatarSrc }: AdIconProps) {
 
         {content && <>
             <Popover content={content} placement="rightTop" className='ad-popover'>
-                <span className={`pfp-link-badge ${adData?.adId ? '' : 'default-icon'}`}>
+                <span className={`pfp-link-badge ${adData?.adId ? 'ad-icon' : 'default-icon'} ${largeIcon ? 'large-icon' : ''}`}>
                     {adData?.adId && <img referrerPolicy='no-referrer' src={adData?.icon ?? defaultAdIcon}></img>}
                     {!adData?.adId && <>
-                        <i className="fa-solid fa-heart back"></i>
-                        <i className="fa-solid fa-heart front"></i>
+                        <i className="fa-solid fa-heart"></i>
                     </>}
                 </span>
             </Popover>

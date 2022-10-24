@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import './Advertisement.css';
 import config from '../../config';
 import { formatBalance } from '@polkadot/util';
-import { Tooltip } from 'antd';
+import { message, Tooltip } from 'antd';
 
 const Advertisement: React.FC<{
 	ad: any;
@@ -35,7 +35,7 @@ const Advertisement: React.FC<{
 	}
 
 	const sponsorName = ad?.sponsorName ?? 'Parami';
-	const abbreviation = sponsorName.length > 15 ? `${sponsorName.slice(0, 6)}...${sponsorName.slice(-6)}` : null;
+	const abbreviation = sponsorName.startsWith('did:') ? `did:...${sponsorName.slice(-4)}` : null;
 
 	return (
 		<>
@@ -113,6 +113,12 @@ const Advertisement: React.FC<{
 
 						{claimed && <>
 							<div className='btnContainer'>
+								<div className='actionBtnBig' onClick={async () => {
+									if (navigator.clipboard) {
+										navigator.clipboard.writeText('Hundreds of Celebrity NFT Powers awaits you to FREE claim! Install and GemHunt on Twitter HERE ❤️ https://chrome.google.com/webstore/detail/parami-hyperlink-nft-exte/gilmlbeecofjmogfkaocnjmbiblmifad');
+										message.success('Copied');
+									}
+								}}>Share</div>
 								<div className='actionBtnBig' onClick={() => window.open(config.paramiWallet)}>Check wallet</div>
 							</div>
 						</>}

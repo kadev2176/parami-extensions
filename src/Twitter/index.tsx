@@ -114,10 +114,10 @@ import 'antd/dist/antd.css';
           if (adInfo.isParamiAd) {
             chrome.runtime.sendMessage({ method: 'fetchAd', adInfo }, (response) => {
               const { ad } = response;
-              root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} />);
+              root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} largeIcon={a.href.endsWith('/photo')} />);
             });
           } else {
-            root.render(<AdIcon ad={{success: true, data: null}} href={href} />);
+            root.render(<AdIcon ad={{success: true, data: null}} href={href} largeIcon={a.href.endsWith('/photo')} />);
           }
         }
       }

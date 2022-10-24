@@ -258,11 +258,14 @@
 
 .btnContainer {
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-around;
+  text-align: center;
   padding-top: 8px;
 }
 
 .actionBtnBig {
+  min-width: 100px;
   color: #ffffff;
   font-weight: 700;
   cursor: pointer;

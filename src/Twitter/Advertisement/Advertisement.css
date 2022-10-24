@@ -255,13 +255,13 @@
   color: #939393;
 }
 
-.instructionClaimBtnContainer {
+.btnContainer {
   display: flex;
   justify-content: center;
   padding-top: 8px;
 }
 
-.instructionClaimBtn {
+.actionBtnBig {
   color: #ffffff;
   font-weight: 700;
   cursor: pointer;
@@ -271,6 +271,6 @@
   background: #ff5b00;
 }
 
-.instructionClaimBtn:hover {
+.actionBtnBig:hover {
   background: #ff7c33;
 }

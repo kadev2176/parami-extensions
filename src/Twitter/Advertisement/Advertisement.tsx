@@ -96,15 +96,13 @@ const Advertisement: React.FC<{
 									<span className='rewardToken'>{ad?.assetName} NFT Power</span>
 								</span>
 							</div>
-							{/* <div className='buttons'>
-								<>
-									<div className='claimBtn actionBtn' onMouseEnter={openInstructionPopover} onMouseLeave={delayCloseInstructionPopover}>Claim</div>
-									<div className='instructionsBtn actionBtn' onClick={() => {
-										window.open(`${config.paramiWallet}/swap/${ad.nftId}`);
-									}}>Buy more</div>
-								</>
-							</div> */}
 						</div>
+
+						{claimed && <>
+							<div className='btnContainer'>
+								<div className='actionBtnBig' onClick={() => window.open(config.paramiWallet)}>Check wallet</div>
+							</div>
+						</>}
 
 						{!claimed && <>
 							{ad?.instructions?.length > 0 && <>
@@ -125,8 +123,8 @@ const Advertisement: React.FC<{
 								</div>
 							</>}
 
-							<div className='instructionClaimBtnContainer'>
-								<div className='instructionClaimBtn actionBtn' onClick={() => openClaimWindow()}>{claimText}</div>
+							<div className='btnContainer'>
+								<div className='actionBtnBig' onClick={() => openClaimWindow()}>{claimText}</div>
 							</div>
 						</>}
 					</div>}

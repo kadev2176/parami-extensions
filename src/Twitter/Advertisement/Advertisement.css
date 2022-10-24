@@ -50,7 +50,7 @@
 }
 
 .bidLink {
-  float: right;
+  white-space: normal;
 }
 
 .sponsorText {
@@ -87,6 +87,7 @@
 
 .adSection {
   position: relative;
+  margin-top: 5px;
 }
 
 .adSectionArrow {

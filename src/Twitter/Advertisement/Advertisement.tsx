@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import './Advertisement.css';
 import config from '../../config';
 import { formatBalance } from '@polkadot/util';
+import { Tooltip } from 'antd';
 
 const Advertisement: React.FC<{
 	ad: any;
@@ -33,6 +34,9 @@ const Advertisement: React.FC<{
 		window.open(`${config.paramiWallet}/create/popup`, 'Parami Create DID', 'popup,width=400,height=600');
 	}
 
+	const sponsorName = ad?.sponsorName ?? 'Parami';
+	const abbreviation = sponsorName.length > 15 ? `${sponsorName.slice(0, 6)}...${sponsorName.slice(-6)}` : null;
+
 	return (
 		<>
 			<div className='advertisementContainer'>
@@ -55,9 +59,18 @@ const Advertisement: React.FC<{
 					<div className='sponsorInfo'>
 						{ad?.icon && <img referrerPolicy='no-referrer' className='sponsorIcon' src={ad?.icon}></img>}
 						<span className='sponsorText'>
-							<span className='sponsorName'>
-								{`${ad?.sponsorName ?? 'Parami'}`}
-							</span>
+							{!!abbreviation && <>
+								<Tooltip title={sponsorName}>
+									<span className='sponsorName'>
+										{abbreviation}
+									</span>
+								</Tooltip>
+							</>}
+							{!abbreviation && <>
+								<span className='sponsorName'>
+									{sponsorName}
+								</span>
+							</>}
 							is sponsoring this hNFT.
 							<a className='bidLink' href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">I want to bid</a>
 						</span>

@@ -21,12 +21,14 @@ function readFile(path, prefix, extension) {
 const js = readFile('assets', 'index', 'js')
 const css = readFile('assets', 'index', 'css')
 const logo = readFile('assets', 'logo', 'svg')
+const fontawesome = readFile('fontawesome', 'fontawesome', 'js');
+const solid = readFile('fontawesome', 'solid', 'js');
 
 const content_scripts = manifest.content_scripts;
 
 content_scripts[0] = {
   ...content_scripts[0],
-  js: [js],
+  js: [js, fontawesome, solid],
   css: [css]
 }
 

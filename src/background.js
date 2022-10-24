@@ -56,7 +56,14 @@ const noAdResponse = {
     try {
       const slotResp = await api.query.ad.slotOf(adInfo.nftId);
 
-      if (slotResp.isEmpty) return noAdResponse;
+      if (slotResp.isEmpty) {
+        return {
+          success: true,
+          data: {
+            nftId: adInfo.nftId,
+          }
+        }
+      }
 
       const { adId, budgetPot, fractionId } = slotResp.toHuman();
       const adResp = await api.query.ad.metadata(adId);

@@ -20,8 +20,22 @@
   white-space: nowrap;
 }
 
+.bidSection {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.bidSection .kolIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin: 10px;
+}
+
 .sponsorInfo {
-  background: #EFEFEF;
+  background: #ffffff;
+  /* background: #EFEFEF; */
   padding: 4px 12px;
   display: flex;
   flex-direction: row;
@@ -33,6 +47,10 @@
   width: 20px;
   border-radius: 50%;
   margin-right: 4px;
+}
+
+.bidLink {
+  white-space: normal;
 }
 
 .sponsorText {
@@ -61,6 +79,32 @@
 
 .bidBtn:hover {
   background: #cbcbcb;
+}
+
+.claimLink {
+  margin-left: 5px;
+}
+
+.adSection {
+  position: relative;
+  margin-top: 5px;
+}
+
+.adSectionArrow {
+  background: #EFEFEF;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  transform: rotate(45deg);
+  left: 12px;
+  top: -5px;
+  z-index: 1;
+}
+.adContent {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 2;
 }
 
 .adMediaImg {
@@ -173,14 +217,7 @@
   position: relative;
 }
 
-.instructions .popoverContent {
-  background: #D9D9D9;
-  padding: 10px;
-  position: relative;
-  z-index: 1;
-}
-
-.instructions .instruction {
+.instructionSection .instruction {
   background: #F3F3F3;
   cursor: pointer;
   display: flex;
@@ -190,15 +227,15 @@
   padding: 4px 8px;
 }
 
-.instructions .instruction:hover {
+.instructionSection .instruction:hover {
   background: #e6e6e6;
 }
 
-.instructions .instruction+.instruction {
+.instructionSection .instruction+.instruction {
   margin-top: 8px;
 }
 
-.instructions .instruction .instructionText {
+.instructionSection .instruction .instructionText {
   flex-grow: 1;
   color: #717171;
 }
@@ -214,29 +251,18 @@
   color: #000000;
 }
 
-.instructions .popoverArrow {
-  background: #D9D9D9;
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  transform: rotate(45deg);
-  left: 60%;
-  top: -10px;
-  z-index: 0;
-}
-
 .instructionTitle {
   margin-bottom: 5px;
-  color: rgba(0, 0, 0, 0.6)
+  color: #939393;
 }
 
-.instructionClaimBtnContainer {
+.btnContainer {
   display: flex;
   justify-content: center;
   padding-top: 8px;
 }
 
-.instructionClaimBtn {
+.actionBtnBig {
   color: #ffffff;
   font-weight: 700;
   cursor: pointer;
@@ -246,6 +272,6 @@
   background: #ff5b00;
 }
 
-.instructionClaimBtn:hover {
+.actionBtnBig:hover {
   background: #ff7c33;
 }

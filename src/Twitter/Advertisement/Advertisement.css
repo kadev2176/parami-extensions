@@ -97,11 +97,13 @@
   transform: rotate(45deg);
   left: 12px;
   top: -5px;
-  z-index: -1;
+  z-index: 1;
 }
 .adContent {
+  position: relative;
   border-radius: 10px;
   overflow: hidden;
+  z-index: 2;
 }
 
 .adMediaImg {
@@ -214,13 +216,6 @@
   position: relative;
 }
 
-.instructions .popoverContent {
-  background: #D9D9D9;
-  padding: 10px;
-  position: relative;
-  z-index: 1;
-}
-
 .instructionSection .instruction {
   background: #F3F3F3;
   cursor: pointer;
@@ -253,17 +248,6 @@
   font-size: 14px;
   font-weight: 700;
   color: #000000;
-}
-
-.instructions .popoverArrow {
-  background: #D9D9D9;
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  transform: rotate(45deg);
-  left: 60%;
-  top: -10px;
-  z-index: 0;
 }
 
 .instructionTitle {

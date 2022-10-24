@@ -351,7 +351,7 @@ export const parseMetaLink = async (metaLink, jumps) => {
                 const newLink = (await hContract.getSlotUri(tokenId, paramiServer.paramiLinkAddress)).toString();
                 return parseMetaLink(newLink || 'https://app.parami.io', jumps + 1);
             } catch (e) {
-                console.error('[Parami Extension] Get link error', e);
+                console.error('[Hyperlink NFT Extension] Get link error', e);
                 return 'https://app.parami.io';
             }
         } else if (metaLink.startsWith(PREFIX_DID)) {

@@ -57,12 +57,13 @@ const Advertisement: React.FC<{
 			<div className='advertisementContainer'>
 				<div className='ownerInfo'>
 					<span>📢 This hNFT is reserved.</span>
-					<a className='claimLink' href={`${config.paramiWallet}/claim/hnft`} target='_blank'>I am the owner</a>
+					<a className='claimLink' href={`${config.paramiWallet}/claimHnft/${ad.nftId}`} target='_blank'>I am the owner</a>
 				</div>
 				<div className='sponsorInfo'>
 					{ad?.icon && <img referrerPolicy='no-referrer' className='sponsorIcon' src={ad?.icon}></img>}
-					<span className='sponsorText'><span className='sponsorName'>{ad?.sponsorName ?? 'Parami'}</span>is sponsoring this hNFT</span>
-					<div className='bidBtn' onClick={() => window.open(`${config.paramiWallet}/dashboard`)}>BID</div>
+					{/* todo: temporarily slice sponsor name. change to new ui later */}
+					<span className='sponsorText'><span className='sponsorName'>{`${(ad?.sponsorName ?? 'Parami').slice(0, 30)}`}</span>is sponsoring this hNFT</span>
+					<div className='bidBtn' onClick={() => window.open(`${config.paramiWallet}/bid/${ad.nftId}`)}>BID</div>
 				</div>
 				<img
 					src={ad?.media}

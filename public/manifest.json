@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Parami Hyperlink NFT Extension",
-  "version": "0.0.5",
+  "name": "Hyperlink NFT Extension",
+  "version": "0.0.7",
   "description": "Enable Hyperlink for your HNFT profile photo.",
   "icons": {
     "16": "icons/icon_16.png",
@@ -19,7 +19,7 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Parami Hyperlink NFT Extension",
+    "default_title": "Hyperlink NFT Extension",
     "default_popup": "popup.html",
     "default_icon": "icons/icon_32.png"
   },

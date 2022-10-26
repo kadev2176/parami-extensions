@@ -40,7 +40,8 @@ import 'antd/dist/antd.css';
 
         if (!a) continue;
 
-        const container = a.parentElement!.parentElement!;
+        const container = !a.href.endsWith('/photo') ? avatar.closest('[data-testid*="UserAvatar-Container"]') : a.parentElement!.parentElement!;
+        if (!container) continue;
 
         const adIconContainerDiv = container.querySelector(`.${AD_ICON_CONTAINER_CLASSNAME}`);
         if (adIconContainerDiv) {

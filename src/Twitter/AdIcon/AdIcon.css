@@ -22,6 +22,16 @@
   -moz-border-radius: 100%;
   -ms-border-radius: 100%;
   -o-border-radius: 100%;
+  border: 0.5px solid rgb(230, 230, 230);
+}
+
+.pfp-link-badge.ad-icon {
+  border: none;
+  margin-top: -5%;
+}
+
+.pfp-link-badge.ad-icon.large-icon {
+  margin-top: 0%;
 }
 
 .pfp-link-badge img {
@@ -32,9 +42,13 @@
   -ms-border-radius: 100%;
   -o-border-radius: 100%;
   background: #ffffff;
-  box-shadow: 0px 0px 0px 1.5px white;
+  box-shadow: 0px 0px 0px 2px white;
   animation: rotate 2s linear infinite;
   -webkit-animation: rotate 2s linear infinite;
+}
+
+.pfp-link-badge.large-icon img {
+  box-shadow: 0px 0px 0px 3px white;
 }
 
 .pfp-link-badge.pure-link {
@@ -57,33 +71,38 @@
 }
 
 .pfp-link-badge.default-icon {
-  width: 30%;
-  height: 30%;
+  width: 40%;
+  height: 40%;
+  margin-top: 0%;
+  margin-right: -11%;
   min-width: 10px;
   min-height: 10px;
   max-width: 30px;
   max-height: 30px;
   color: #ff5b00;
-  background: unset;
+  background: white;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+.pfp-link-badge.default-icon.large-icon {
+  max-width: 40px;
+  max-height: 40px;
+  margin-right: -4%;
+  margin-top: 4%;
+}
+
 .pfp-link-badge.default-icon svg {
   position: absolute;
+  width: 60%;
+  height: 60%;
 }
 
-.pfp-link-badge.default-icon svg.back {
-  width: 100%;
-  height: 100%;
-  color: #ffffff;
-}
-
-.pfp-link-badge.default-icon svg.front {
-  width: 85%;
-  height: 85%;
-}
+/* .pfp-link-badge.default-icon.large-icon svg {
+  width: 60%;
+  height: 60%;
+} */
 
 /* .priceInfo {
   width: fit-content;

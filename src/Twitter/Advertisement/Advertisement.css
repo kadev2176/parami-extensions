@@ -1,42 +1,42 @@
 .advertisementContainer {
-  max-width: 300px;
+  width: 350px;
+  max-width: 350px;
   font-size: 12px;
   border: 1px solid #e4e4e4;
+  margin-top: -40px;
 }
 
 .ownerInfo {
-  padding: 4px 12px;
-  background: #F8F8F8;
+  padding: 4px 22px;
+  background-color: rgb(255, 124, 51, 0.15);
   color: #746D6D;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
 
-.smFont {
-  font-size: 12px;
-  transform: scale(0.666);
-  transform-origin: 0 center;
-  white-space: nowrap;
+.sponsorLink {
+  text-decoration: underline;
 }
 
 .bidSection {
   display: flex;
   flex-direction: row;
   align-items: center;
+  padding: 0 22px;
 }
 
 .bidSection .kolIcon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin: 10px;
+  margin-right: 10px;
 }
 
 .sponsorInfo {
   background: #ffffff;
   /* background: #EFEFEF; */
-  padding: 4px 12px;
+  padding: 4px 22px;
   display: flex;
   flex-direction: row;
   color: #8E8E8E;
@@ -47,10 +47,12 @@
   width: 20px;
   border-radius: 50%;
   margin-right: 4px;
+  border: 0.5px solid rgb(230, 230, 230);
 }
 
 .bidLink {
-  white-space: normal;
+  white-space: nowrap;
+  text-decoration: underline;
 }
 
 .sponsorText {
@@ -58,6 +60,7 @@
 }
 
 .sponsorText .sponsorName {
+  color: #3c3c3c;
   font-weight: 700;
   margin-right: 4px;
 }
@@ -83,14 +86,21 @@
 
 .claimLink {
   margin-left: 5px;
+  text-decoration: underline;
 }
 
 .adSection {
   position: relative;
-  margin-top: 5px;
+  margin: 0 5px;
 }
 
-.adSectionArrow {
+.adBubble {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+/* .adSectionArrow {
   background: #EFEFEF;
   width: 20px;
   height: 20px;
@@ -100,6 +110,13 @@
   top: -5px;
   z-index: 1;
 }
+.adSectionArrow.back {
+  border: 1px solid;
+}
+.adSectionArrow.front {
+  z-index: 3;
+} */
+
 .adContent {
   position: relative;
   border-radius: 10px;
@@ -113,8 +130,8 @@
 }
 
 .adDescription {
-  background: #EFEFEF;
   padding: 9px 12px;
+  padding-top: 15px;
 }
 
 .descriptionText {
@@ -128,13 +145,20 @@
   margin-right: 5px;
 }
 
+.divider {
+  width: 100%;
+  height: 1px;
+  background: #dadada;
+  margin: 5px 0;
+}
+
 .claimSection {
-  padding: 9px 12px;
+  padding: 8px 22px;
+  padding-top: 0;
 }
 
 .claimSection .infoText {
   color: #939393;
-  margin-bottom: 5px;
 }
 
 .rewardRow {
@@ -165,11 +189,11 @@
 .rewardInfo .rewardNumber {
   font-size: 18px;
   font-weight: 900;
-  margin-right: 4px;
 }
 
 .rewardInfo .rewardToken {
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .rewardRow .buttons {
@@ -212,13 +236,8 @@
   border-radius: 13px;
 }
 
-.instructions {
-  padding: 0 10px 10px 10px;
-  position: relative;
-}
-
 .instructionSection .instruction {
-  background: #F3F3F3;
+  border: 1px solid #dadada;
   cursor: pointer;
   display: flex;
   flex-direction: row;
@@ -228,7 +247,7 @@
 }
 
 .instructionSection .instruction:hover {
-  background: #e6e6e6;
+  background: #f3f3f3;
 }
 
 .instructionSection .instruction+.instruction {
@@ -241,6 +260,7 @@
 }
 
 .instructionTag {
+  white-space: nowrap;
   margin-right: 4px;
 }
 
@@ -259,7 +279,7 @@
 .btnContainer {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: center;
   text-align: center;
   padding-top: 8px;
 }
@@ -269,10 +289,17 @@
   color: #ffffff;
   font-weight: 700;
   cursor: pointer;
-  padding: 4px 10px;
+  padding: 6px 10px;
   width: fit-content;
-  border-radius: 13px;
+  border-radius: 15px;
   background: #ff5b00;
+}
+.actionBtnBig.left {
+  border-radius: 15px 0 0 15px;
+  margin-right: 1px;
+}
+.actionBtnBig.right {
+  border-radius: 0 15px 15px 0;
 }
 
 .actionBtnBig:hover {

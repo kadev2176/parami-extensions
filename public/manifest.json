@@ -11,7 +11,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": [ "icons/logo-round-core.svg" ],
+      "resources": [ "icons/logo-round-core.svg", "icons/bubble.svg" ],
       "matches": [ "*://*/*" ]
     }
   ],

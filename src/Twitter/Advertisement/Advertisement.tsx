@@ -4,6 +4,8 @@ import config from '../../config';
 import { formatBalance } from '@polkadot/util';
 import { message, Tooltip } from 'antd';
 
+const bubble = chrome.runtime.getURL('icons/bubble.svg');
+
 const Advertisement: React.FC<{
 	ad: any;
 	claimed: boolean;
@@ -47,7 +49,7 @@ const Advertisement: React.FC<{
 					</div>
 					<div className='bidSection'>
 						<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
-						<a href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">Sponsor this HNFT</a>
+						<a href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank" className='sponsorLink'>Sponsor this HNFT</a>
 					</div>
 				</>}
 
@@ -71,12 +73,12 @@ const Advertisement: React.FC<{
 									{sponsorName}
 								</span>
 							</>}
-							is sponsoring this hNFT.
+							<span>is sponsoring this hNFT. </span>
 							<a className='bidLink' href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">I want to bid</a>
 						</span>
 					</div>
 					<div className='adSection'>
-						<div className='adSectionArrow'></div>
+						<img className='adBubble' src={bubble}></img>
 						<div className='adContent'>
 							<div className='adDescription'>
 								<span className='descriptionText'>{ad?.content ?? ad?.description ?? 'View Ads. Get Paid.'}</span>
@@ -91,6 +93,8 @@ const Advertisement: React.FC<{
 							/>
 						</div>
 					</div>
+
+					<div className='divider'></div>
 
 					{!userDid && <div className='noDidSection'>
 						<div className='createDidBtn actionBtn' onClick={() => openCreateAccountWindow()}>Create DID and claim!</div>
@@ -113,13 +117,13 @@ const Advertisement: React.FC<{
 
 						{claimed && <>
 							<div className='btnContainer'>
-								<div className='actionBtnBig' onClick={async () => {
+								<div className='actionBtnBig left' onClick={async () => {
 									if (navigator.clipboard) {
 										navigator.clipboard.writeText('Hundreds of Celebrity NFT Powers awaits you to FREE claim! Install and GemHunt on Twitter HERE ❤️ https://chrome.google.com/webstore/detail/parami-hyperlink-nft-exte/gilmlbeecofjmogfkaocnjmbiblmifad');
 										message.success('Copied');
 									}
 								}}>Share</div>
-								<div className='actionBtnBig' onClick={() => window.open(config.paramiWallet)}>Check wallet</div>
+								<div className='actionBtnBig right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Support More</div>
 							</div>
 						</>}
 
@@ -148,7 +152,6 @@ const Advertisement: React.FC<{
 						</>}
 					</div>}
 				</>}
-
 			</div>
 		</>
 	)

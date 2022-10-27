@@ -20,7 +20,7 @@ function readFile(path, prefix, extension) {
 
 const js = readFile('assets', 'index', 'js')
 const css = readFile('assets', 'index', 'css')
-const logo = readFile('assets', 'logo', 'svg')
+// const bubble = readFile('assets', 'bubble', 'svg')
 const fontawesome = readFile('fontawesome', 'fontawesome', 'js');
 const solid = readFile('fontawesome', 'solid', 'js');
 

@@ -74,7 +74,7 @@ const Advertisement: React.FC<{
 								</span>
 							</>}
 							<span>is sponsoring this hNFT. </span>
-							<a className='bidLink' href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">I want to bid</a>
+							<a className='bidLink' href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">Bid on this ad space</a>
 						</span>
 					</div>
 					<div className='adSection'>
@@ -118,12 +118,9 @@ const Advertisement: React.FC<{
 						{claimed && <>
 							<div className='btnContainer'>
 								<div className='actionBtnBig left' onClick={async () => {
-									if (navigator.clipboard) {
-										navigator.clipboard.writeText('Hundreds of Celebrity NFT Powers awaits you to FREE claim! Install and GemHunt on Twitter HERE ❤️ https://chrome.google.com/webstore/detail/parami-hyperlink-nft-exte/gilmlbeecofjmogfkaocnjmbiblmifad');
-										message.success('Copied');
-									}
+									window.open(`https://twitter.com/intent/tweet?text=Hundreds of Celebrity NFT Powers awaits you to FREE claim! Install and GemHunt on Twitter HERE ❤️ @ParamiProtocol&url=https://chrome.google.com/webstore/detail/parami-hyperlink-nft-exte/gilmlbeecofjmogfkaocnjmbiblmifad`);
 								}}>Share</div>
-								<div className='actionBtnBig right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Support More</div>
+								<div className='actionBtnBig right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Support this influencer</div>
 							</div>
 						</>}
 

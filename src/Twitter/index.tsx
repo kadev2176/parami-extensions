@@ -46,16 +46,16 @@ import 'antd/dist/antd.css';
 
         if (!a) continue;
 
-        const container = !a.href.endsWith('/photo') ? avatar.closest('[data-testid*="UserAvatar-Container"]') : a.parentElement!.parentElement!;
+        const isRegularAvatar = !a.href.endsWith('/photo') && !a.href.endsWith('/nft');
+
+        const container = isRegularAvatar ? avatar.closest('[data-testid*="UserAvatar-Container"]') : a.parentElement!.parentElement!;
         if (!container) continue;
 
         const adIconContainerDiv = container.querySelector(`.${AD_ICON_CONTAINER_CLASSNAME}`);
         if (adIconContainerDiv) {
-          if (!a.href.endsWith('/photo')) {
-            console.log('loop avatar skipping', AD_ICON_CONTAINER_CLASSNAME, adIconContainerDiv);
+          if (isRegularAvatar) {
             continue;
           }
-          console.log('loop avatar Removing /photo');
           adIconContainerDiv.remove();
         }
 
@@ -122,10 +122,10 @@ import 'antd/dist/antd.css';
           if (adInfo.isParamiAd) {
             chrome.runtime.sendMessage({ method: 'fetchAd', adInfo }, (response) => {
               const { ad } = response;
-              root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} largeIcon={a.href.endsWith('/photo')} />);
+              root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} largeIcon={!isRegularAvatar} />);
             });
           } else {
-            root.render(<AdIcon ad={{ success: true, data: null }} href={href} largeIcon={a.href.endsWith('/photo')} />);
+            root.render(<AdIcon ad={{ success: true, data: null }} href={href} largeIcon={!isRegularAvatar} />);
           }
         }
       }

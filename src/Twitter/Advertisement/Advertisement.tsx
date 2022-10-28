@@ -4,6 +4,8 @@ import config from '../../config';
 import { formatBalance } from '@polkadot/util';
 import { message, Tooltip } from 'antd';
 
+const bubble = chrome.runtime.getURL('icons/bubble.svg');
+
 const Advertisement: React.FC<{
 	ad: any;
 	claimed: boolean;
@@ -47,7 +49,7 @@ const Advertisement: React.FC<{
 					</div>
 					<div className='bidSection'>
 						<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
-						<a href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">Sponsor this HNFT</a>
+						<a href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank" className='sponsorLink'>Sponsor this HNFT</a>
 					</div>
 				</>}
 
@@ -71,12 +73,12 @@ const Advertisement: React.FC<{
 									{sponsorName}
 								</span>
 							</>}
-							is sponsoring this hNFT.
-							<a className='bidLink' href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">I want to bid</a>
+							<span>is sponsoring this hNFT. </span>
+							<a className='bidLink' href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">Bid on this ad space</a>
 						</span>
 					</div>
 					<div className='adSection'>
-						<div className='adSectionArrow'></div>
+						{!!ad?.media && <img className='adBubble' src={bubble}></img>}
 						<div className='adContent'>
 							<div className='adDescription'>
 								<span className='descriptionText'>{ad?.content ?? ad?.description ?? 'View Ads. Get Paid.'}</span>
@@ -91,6 +93,8 @@ const Advertisement: React.FC<{
 							/>
 						</div>
 					</div>
+
+					<div className='divider'></div>
 
 					{!userDid && <div className='noDidSection'>
 						<div className='createDidBtn actionBtn' onClick={() => openCreateAccountWindow()}>Create DID and claim!</div>
@@ -113,13 +117,10 @@ const Advertisement: React.FC<{
 
 						{claimed && <>
 							<div className='btnContainer'>
-								<div className='actionBtnBig' onClick={async () => {
-									if (navigator.clipboard) {
-										navigator.clipboard.writeText('Hundreds of Celebrity NFT Powers awaits you to FREE claim! Install and GemHunt on Twitter HERE ❤️ https://chrome.google.com/webstore/detail/parami-hyperlink-nft-exte/gilmlbeecofjmogfkaocnjmbiblmifad');
-										message.success('Copied');
-									}
+								<div className='actionBtnBig left' onClick={async () => {
+									window.open(`https://twitter.com/intent/tweet?text=Hundreds of Celebrity NFT Powers awaits you to FREE claim! Install and GemHunt on Twitter HERE ❤️ @ParamiProtocol&url=https://chrome.google.com/webstore/detail/parami-hyperlink-nft-exte/gilmlbeecofjmogfkaocnjmbiblmifad`);
 								}}>Share</div>
-								<div className='actionBtnBig' onClick={() => window.open(config.paramiWallet)}>Check wallet</div>
+								<div className='actionBtnBig right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Support this influencer</div>
 							</div>
 						</>}
 
@@ -148,8 +149,16 @@ const Advertisement: React.FC<{
 						</>}
 					</div>}
 				</>}
-
 			</div>
+
+			{/* todo: add clip path */}
+			{/* <svg height="0" width="0" viewBox='0 0 24 24'>
+				<defs>
+					<clipPath clipPathUnits="objectBoundingBox" id="clipPath" transform="scale(0.005 0.005319148936170213)">
+						<path d="M 22.25 12 c 0 -1.43 -0.88 -2.67 -2.19 -3.34 c 0.46 -1.39 0.2 -2.9 -0.81 -3.91 s -2.52 -1.27 -3.91 -0.81 c -0.66 -1.31 -1.91 -2.19 -3.34 -2.19 s -2.67 0.88 -3.33 2.19 c -1.4 -0.46 -2.91 -0.2 -3.92 0.81 s -1.26 2.52 -0.8 3.91 c -1.31 0.67 -2.2 1.91 -2.2 3.34 s 0.89 2.67 2.2 3.34 c -0.46 1.39 -0.21 2.9 0.8 3.91 s 2.52 1.26 3.91 0.81 c 0.67 1.31 1.91 2.19 3.34 2.19 s 2.68 -0.88 3.34 -2.19 c 1.39 0.45 2.9 0.2 3.91 -0.81 s 1.27 -2.52 0.81 -3.91 c 1.31 -0.67 2.19 -1.91 2.19 -3.34 Z m -11.71 4.2 Z"></path>
+					</clipPath>
+				</defs>
+			</svg> */}
 		</>
 	)
 };

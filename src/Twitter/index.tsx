@@ -2,7 +2,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import { AD_ICON_CONTAINER_CLASSNAME, NFT_RECOGNITION_ENDPOINT, PREFIX_WNFT } from '../models';
+import { AD_ICON_CONTAINER_CLASSNAME, NFT_RECOGNITION_ENDPOINT, NOT_PARAMI_AD, PREFIX_WNFT } from '../models';
 import { fetchBin, solveBin, parseWnft, parseMetaLink, parseAdInfoFromUrl } from '../utilities';
 import AdIcon from './AdIcon/AdIcon';
 import 'antd/dist/antd.css';
@@ -11,6 +11,7 @@ import 'antd/dist/antd.css';
   const nodeMap = new Map();
   const imgUrl2Wnft = new Map();
   const wnft2href = new Map();
+  let fromUser: string;
 
   const callback = async (mutations: any) => {
     for (let i = 0; i < mutations.length; i += 1) {
@@ -31,6 +32,11 @@ import 'antd/dist/antd.css';
 
     const avatars = document.querySelectorAll('img[src*="profile_images"]');
 
+    if (!fromUser) {
+      const userDataTestid = document.querySelector('div[aria-label="Account menu"]')?.querySelector('[data-testid*="UserAvatar-Container"]')?.getAttribute('data-testid') ?? '';
+      fromUser = userDataTestid.slice(userDataTestid.lastIndexOf('-') + 1);
+    }
+
     for (let i = 0; i < avatars.length; i += 1) {
       const avatar = avatars[i] as HTMLImageElement;
       if (!nodeMap.has(avatar)) {
@@ -40,22 +46,24 @@ import 'antd/dist/antd.css';
 
         if (!a) continue;
 
-        const container = a.parentElement!.parentElement!;
+        const isRegularAvatar = !a.href.endsWith('/photo') && !a.href.endsWith('/nft');
+
+        const container = isRegularAvatar ? avatar.closest('[data-testid*="UserAvatar-Container"]') : a.parentElement!.parentElement!;
+        if (!container) continue;
 
         const adIconContainerDiv = container.querySelector(`.${AD_ICON_CONTAINER_CLASSNAME}`);
         if (adIconContainerDiv) {
-          if (!a.href.endsWith('/photo')) {
-            console.log('loop avatar skipping', AD_ICON_CONTAINER_CLASSNAME, adIconContainerDiv);
+          if (isRegularAvatar) {
             continue;
           }
-          console.log('loop avatar Removing /photo');
           adIconContainerDiv.remove();
         }
 
         if (a.href.endsWith('/followers_you_follow')) continue;
 
         if (!imgUrl2Wnft.has(avatar.src)) {
-          const fetchNftResp = await fetch(`${NFT_RECOGNITION_ENDPOINT}?imageUrl=${avatar.src}`);
+          const targetUsername = a.href.slice(a.href.lastIndexOf('/') + 1);
+          const fetchNftResp = await fetch(`${NFT_RECOGNITION_ENDPOINT}?imageUrl=${avatar.src}&targetUser=${targetUsername !== 'photo' ? targetUsername : ''}&fromUser=${fromUser}`);
           if (fetchNftResp.ok) {
             const hnft = await fetchNftResp.json();
             imgUrl2Wnft.set(avatar.src, `${PREFIX_WNFT}${hnft.contractAddress}?tokenId=${hnft.tokenId}`)
@@ -114,10 +122,10 @@ import 'antd/dist/antd.css';
           if (adInfo.isParamiAd) {
             chrome.runtime.sendMessage({ method: 'fetchAd', adInfo }, (response) => {
               const { ad } = response;
-              root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} largeIcon={a.href.endsWith('/photo')} />);
+              root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} largeIcon={!isRegularAvatar} />);
             });
           } else {
-            root.render(<AdIcon ad={{success: true, data: null}} href={href} largeIcon={a.href.endsWith('/photo')} />);
+            root.render(<AdIcon ad={NOT_PARAMI_AD} href={href} largeIcon={!isRegularAvatar} />);
           }
         }
       }
@@ -135,7 +143,7 @@ import 'antd/dist/antd.css';
     console.log(e);
   }
 
-  chrome.runtime.sendMessage({ method: 'openTwitterTab' }, () => {});
+  chrome.runtime.sendMessage({ method: 'openTwitterTab' }, () => { });
 
   chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {

@@ -38,3 +38,8 @@ export const NETWORK_TEST = {
     paramiLinkAddress: '0x75EE8Ce53Bd26C21405Def16Dd416C90054E7146',
     chainId: 4
 }
+
+export const NOT_PARAMI_AD = {
+    success: true,
+    data: null
+}

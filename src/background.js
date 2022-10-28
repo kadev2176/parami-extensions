@@ -5,7 +5,7 @@
 // For more information on background script,
 // See https://developer.chrome.com/extensions/background_pages
 
-import { NETWORK_MAINNET, NETWORK_TEST } from './models';
+import { NETWORK_MAINNET, NETWORK_TEST, NOT_PARAMI_AD } from './models';
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 // import { formatBalance } from '@polkadot/util';
@@ -17,11 +17,6 @@ chrome.storage.sync.set(
     network: NETWORK_MAINNET,
   },
 );
-
-const noAdResponse = {
-  success: true,
-  data: null
-};
 
 (async () => {
   await cryptoWaitReady();
@@ -37,54 +32,53 @@ const noAdResponse = {
   const fetchAd = async (adInfo, did) => {
     if (!adInfo.nftId) {
       if (!adInfo.contractAddress || !adInfo.tokenId) {
-        return noAdResponse;
+        return NOT_PARAMI_AD;
       }
 
       const nftIdResp = await api.query.nft.ported('Ethereum', adInfo.contractAddress, adInfo.tokenId);
-      
+
       if (nftIdResp.isEmpty) {
-        return noAdResponse;
+        return NOT_PARAMI_AD;
       }
 
       adInfo.nftId = deleteComma(nftIdResp.toHuman());
     }
 
     if (!adInfo.nftId) {
-      return noAdResponse;
+      return NOT_PARAMI_AD;
     }
 
+    const resp = {
+      success: true,
+      data: {
+        nftId: adInfo.nftId,
+      }
+    }
     try {
       const slotResp = await api.query.ad.slotOf(adInfo.nftId);
 
       if (slotResp.isEmpty) {
-        return {
-          success: true,
-          data: {
-            nftId: adInfo.nftId,
-          }
-        }
+        return resp;
       }
 
-      const { adId, budgetPot, fractionId } = slotResp.toHuman();
+      const { adId } = slotResp.toHuman();
       const adResp = await api.query.ad.metadata(adId);
 
-      if (adResp.isEmpty) return noAdResponse;
+      if (adResp.isEmpty) {
+        return resp;
+      };
 
       const ad = adResp.toHuman();
 
-      if (ad?.metadata?.indexOf('ipfs://') < 0) return noAdResponse;
-
-      const hash = ad?.metadata?.substring(7);
-
-      const adJsonResp = await fetch(config.ipfsEndpoint + hash);
-      const adJson = await adJsonResp.json();
+      let adJson = {};
+      if (ad?.metadata?.startsWith('ipfs://')) {
+        const hash = ad?.metadata?.substring(7);
+        const adJsonResp = await fetch(config.ipfsEndpoint + hash);
+        adJson = await adJsonResp.json();
+      }
 
       const adClaimed = did ? !(await api.query.ad.payout(adId, did)).isEmpty : false;
-
-      const nftInfo = await api.query.nft.metadata(adInfo.nftId);
-      const tokenAssetId = nftInfo.isEmpty ? '' : (nftInfo.toHuman()).tokenAssetId;
-
-      const assetInfo = await api.query.assets.metadata(Number(deleteComma(tokenAssetId)));
+      const assetInfo = await api.query.assets.metadata(Number(deleteComma(adInfo.nftId)));
       const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
 
       // const value = await api.rpc.swap.drylySellTokens(deleteComma(tokenAssetId), '1'.padEnd(18, '0'));
@@ -154,7 +148,7 @@ const noAdResponse = {
 
 // detect tabs change
 chrome.tabs.onUpdated.addListener(
-  function(tabId, changeInfo, tab) {
+  function (tabId, changeInfo, tab) {
     console.log('tab change detected', tabId, changeInfo, tab);
     if (changeInfo.url && changeInfo.url.startsWith('https://twitter.com')) {
       chrome.tabs.sendMessage(tabId, {

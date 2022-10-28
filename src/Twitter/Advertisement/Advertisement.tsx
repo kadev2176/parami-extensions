@@ -49,7 +49,7 @@ const Advertisement: React.FC<{
 					</div>
 					<div className='bidSection'>
 						<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
-						<a href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank" className='sponsorLink'>Sponsor this HNFT</a>
+						<a href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank" className='bidLink'>Bid on this ad space</a>
 					</div>
 				</>}
 
@@ -120,7 +120,7 @@ const Advertisement: React.FC<{
 								<div className='actionBtnBig left' onClick={async () => {
 									window.open(`https://twitter.com/intent/tweet?text=Hundreds of Celebrity NFT Powers awaits you to FREE claim! Install and GemHunt on Twitter HERE ❤️ @ParamiProtocol&url=https://chrome.google.com/webstore/detail/parami-hyperlink-nft-exte/gilmlbeecofjmogfkaocnjmbiblmifad`);
 								}}>Share</div>
-								<div className='actionBtnBig right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Support this influencer</div>
+								<div className='actionBtnBig right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Sponsor this influencer</div>
 							</div>
 						</>}
 

@@ -15,10 +15,6 @@
   justify-content: space-between;
 }
 
-.sponsorLink {
-  text-decoration: underline;
-}
-
 .bidSection {
   display: flex;
   flex-direction: row;

@@ -78,7 +78,7 @@ const Advertisement: React.FC<{
 						</span>
 					</div>
 					<div className='adSection'>
-						<img className='adBubble' src={bubble}></img>
+						{!!ad?.media && <img className='adBubble' src={bubble}></img>}
 						<div className='adContent'>
 							<div className='adDescription'>
 								<span className='descriptionText'>{ad?.content ?? ad?.description ?? 'View Ads. Get Paid.'}</span>

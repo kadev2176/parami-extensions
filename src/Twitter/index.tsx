@@ -2,7 +2,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import { AD_ICON_CONTAINER_CLASSNAME, NFT_RECOGNITION_ENDPOINT, PREFIX_WNFT } from '../models';
+import { AD_ICON_CONTAINER_CLASSNAME, NFT_RECOGNITION_ENDPOINT, NOT_PARAMI_AD, PREFIX_WNFT } from '../models';
 import { fetchBin, solveBin, parseWnft, parseMetaLink, parseAdInfoFromUrl } from '../utilities';
 import AdIcon from './AdIcon/AdIcon';
 import 'antd/dist/antd.css';
@@ -125,7 +125,7 @@ import 'antd/dist/antd.css';
               root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} largeIcon={!isRegularAvatar} />);
             });
           } else {
-            root.render(<AdIcon ad={{ success: true, data: null }} href={href} largeIcon={!isRegularAvatar} />);
+            root.render(<AdIcon ad={NOT_PARAMI_AD} href={href} largeIcon={!isRegularAvatar} />);
           }
         }
       }

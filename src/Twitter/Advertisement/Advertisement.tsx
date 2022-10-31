@@ -2,9 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import './Advertisement.css';
 import config from '../../config';
 import { formatBalance } from '@polkadot/util';
-import { message, Tooltip } from 'antd';
-
-const bubble = chrome.runtime.getURL('icons/bubble.svg');
+import { Tooltip } from 'antd';
 
 const Advertisement: React.FC<{
 	ad: any;
@@ -78,7 +76,8 @@ const Advertisement: React.FC<{
 						</span>
 					</div>
 					<div className='adSection'>
-						{!!ad?.media && <img className='adBubble' src={bubble}></img>}
+						<div className='adSectionArrow front'></div>
+						<div className='adSectionArrow back'></div>
 						<div className='adContent'>
 							<div className='adDescription'>
 								<span className='descriptionText'>{ad?.content ?? ad?.description ?? 'View Ads. Get Paid.'}</span>
@@ -86,11 +85,13 @@ const Advertisement: React.FC<{
 									{tags.map((tag: string, index: number) => <span className='tag' key={index}>#{tag}</span>)}
 								</span>}
 							</div>
-							<img
-								src={ad?.media}
-								referrerPolicy='no-referrer'
-								className='adMediaImg'
-							/>
+							{ad?.media && <>
+								<img
+									src={ad?.media}
+									referrerPolicy='no-referrer'
+									className='adMediaImg'
+								/>
+							</>}
 						</div>
 					</div>
 

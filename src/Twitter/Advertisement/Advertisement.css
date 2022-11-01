@@ -31,8 +31,7 @@
 
 .sponsorInfo {
   background: #ffffff;
-  /* background: #EFEFEF; */
-  padding: 4px 22px;
+  padding: 10px 22px;
   display: flex;
   flex-direction: row;
   color: #8E8E8E;
@@ -41,6 +40,7 @@
 
 .sponsorInfo .sponsorIcon {
   width: 20px;
+  height: 20px;
   border-radius: 50%;
   margin-right: 4px;
   border: 0.5px solid rgb(230, 230, 230);

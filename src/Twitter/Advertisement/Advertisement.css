@@ -31,8 +31,7 @@
 
 .sponsorInfo {
   background: #ffffff;
-  /* background: #EFEFEF; */
-  padding: 4px 22px;
+  padding: 10px 22px;
   display: flex;
   flex-direction: row;
   color: #8E8E8E;
@@ -41,6 +40,7 @@
 
 .sponsorInfo .sponsorIcon {
   width: 20px;
+  height: 20px;
   border-radius: 50%;
   margin-right: 4px;
   border: 0.5px solid rgb(230, 230, 230);
@@ -96,28 +96,32 @@
   position: absolute;
 }
 
-/* .adSectionArrow {
-  background: #EFEFEF;
+.adSectionArrow {
   width: 20px;
   height: 20px;
   position: absolute;
   transform: rotate(45deg);
-  left: 12px;
+  left: 17px;
   top: -5px;
   z-index: 1;
+  background: #ffffff;
+  border-radius: 5px;
 }
 .adSectionArrow.back {
-  border: 1px solid;
+  border: 1px solid #dadada;
 }
 .adSectionArrow.front {
+  top: -4px;
   z-index: 3;
-} */
+}
 
 .adContent {
   position: relative;
   border-radius: 10px;
   overflow: hidden;
   z-index: 2;
+  border: 1px solid #dadada;
+  background: #ffffff;
 }
 
 .adMediaImg {
@@ -126,8 +130,7 @@
 }
 
 .adDescription {
-  padding: 9px 12px;
-  padding-top: 15px;
+  padding: 12px;
 }
 
 .descriptionText {
@@ -143,7 +146,7 @@
 
 .divider {
   width: 100%;
-  height: 1px;
+  height: 0px;
   background: #dadada;
   margin: 5px 0;
 }

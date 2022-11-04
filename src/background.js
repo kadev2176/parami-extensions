@@ -55,6 +55,13 @@ chrome.storage.sync.set(
       }
     }
     try {
+      const assetInfo = await api.query.assets.metadata(adInfo.nftId);
+      const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
+      const holderAccounts = await api.query.assets.account.entries(adInfo.nftId);
+
+      resp.data.assetName =  asset.name;
+      resp.data.numHolders = holderAccounts?.length;
+
       const slotResp = await api.query.ad.slotOf(adInfo.nftId);
 
       if (slotResp.isEmpty) {
@@ -78,8 +85,9 @@ chrome.storage.sync.set(
       }
 
       const adClaimed = did ? !(await api.query.ad.payout(adId, did)).isEmpty : false;
-      const assetInfo = await api.query.assets.metadata(Number(deleteComma(adInfo.nftId)));
-      const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
+      // const assetInfo = await api.query.assets.metadata(Number(deleteComma(adInfo.nftId)));
+      // const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
+      // const holderAccounts = await api.query.assets.account.entries(adInfo.nftId);
 
       // const value = await api.rpc.swap.drylySellTokens(deleteComma(tokenAssetId), '1'.padEnd(18, '0'));
       // const tokenPrice = value.toHuman();
@@ -93,6 +101,7 @@ chrome.storage.sync.set(
           nftId: adInfo.nftId,
           userDid: did,
           assetName: asset.name,
+          numHolders: holderAccounts?.length
         }
       }
     } catch (e) {

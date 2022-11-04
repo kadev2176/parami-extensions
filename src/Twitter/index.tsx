@@ -2,15 +2,14 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import { AD_ICON_CONTAINER_CLASSNAME, NFT_RECOGNITION_ENDPOINT, NOT_PARAMI_AD, PREFIX_WNFT } from '../models';
-import { fetchBin, solveBin, parseWnft, parseMetaLink, parseAdInfoFromUrl } from '../utilities';
+import { AD_ICON_CONTAINER_CLASSNAME, NOT_PARAMI_AD } from '../models';
+import { queryAdInfoFromAvatar } from '../utilities';
 import AdIcon from './AdIcon/AdIcon';
 import 'antd/dist/antd.css';
 
 (() => {
   const nodeMap = new Map();
-  const imgUrl2Wnft = new Map();
-  const wnft2href = new Map();
+  const imgUrl2AdInfoPromise = new Map();
   let fromUser: string;
 
   const callback = async (mutations: any) => {
@@ -61,72 +60,34 @@ import 'antd/dist/antd.css';
 
         if (a.href.endsWith('/followers_you_follow')) continue;
 
-        if (!imgUrl2Wnft.has(avatar.src)) {
+        if (!imgUrl2AdInfoPromise.has(avatar.src)) {
           const targetUsername = a.href.slice(a.href.lastIndexOf('/') + 1);
-          const fetchNftResp = await fetch(`${NFT_RECOGNITION_ENDPOINT}?imageUrl=${avatar.src}&targetUser=${targetUsername !== 'photo' ? targetUsername : ''}&fromUser=${fromUser}`);
-          if (fetchNftResp.ok) {
-            const hnft = await fetchNftResp.json();
-            imgUrl2Wnft.set(avatar.src, `${PREFIX_WNFT}${hnft.contractAddress}?tokenId=${hnft.tokenId}`)
-          }
+          imgUrl2AdInfoPromise.set(avatar.src, queryAdInfoFromAvatar(avatar.src, targetUsername !== 'photo' ? targetUsername : '', fromUser));
         }
 
-        if (!imgUrl2Wnft.has(avatar.src)) {
-          const uri = new URL(avatar.src);
-          const ext = uri.pathname.split('.').at(-1);
-          const url = `${uri.origin}${uri.pathname
-            .split('_')
-            .slice(0, -1)
-            .join('_')}.${ext}`;
+        const { isHnft, adInfo, hyperlink } = await imgUrl2AdInfoPromise.get(avatar.src);
 
-          // eslint-disable-next-line no-await-in-loop
-          const bin = await fetchBin(url);
-          // eslint-disable-next-line no-await-in-loop
-          const img = await solveBin(bin);
-
-          if (img.width < 20) continue;
-
-          try {
-            const wnft = parseWnft(img);
-            if (wnft) {
-              imgUrl2Wnft.set(avatar.src, wnft);
-            } else {
-              continue;
-            }
-          } catch (e) {
-            console.log('[parami error: parse wnft]', e);
-          }
+        if (!isHnft) {
+          continue;
         }
 
-        const wnftUrl = imgUrl2Wnft.get(avatar.src);
-
-        if (!wnftUrl) continue;
-
-        let href: string;
-        if (!wnft2href.has(wnftUrl)) {
-          href = await parseMetaLink(wnftUrl, 0);
-          wnft2href.set(wnftUrl, href);
+        if (container.querySelector(`.${AD_ICON_CONTAINER_CLASSNAME}`)) {
+          continue;
         }
-        href = wnft2href.get(wnftUrl);
-        if (href) {
-          if (container.querySelector(`.${AD_ICON_CONTAINER_CLASSNAME}`)) {
-            continue;
-          }
-          const adIconContainer = document.createElement('div');
-          adIconContainer.setAttribute('style', 'width: 100%; height:100%;');
-          adIconContainer.setAttribute('class', AD_ICON_CONTAINER_CLASSNAME);
-          container.prepend(adIconContainer);
-          const root = createRoot(adIconContainer);
 
-          const adInfo = parseAdInfoFromUrl(href);
+        const adIconContainer = document.createElement('div');
+        adIconContainer.setAttribute('style', 'width: 100%; height:100%;');
+        adIconContainer.setAttribute('class', AD_ICON_CONTAINER_CLASSNAME);
+        container.prepend(adIconContainer);
+        const root = createRoot(adIconContainer);
 
-          if (adInfo.isParamiAd) {
-            chrome.runtime.sendMessage({ method: 'fetchAd', adInfo }, (response) => {
-              const { ad } = response;
-              root.render(<AdIcon ad={ad} href={href} avatarSrc={avatar.src} largeIcon={!isRegularAvatar} />);
-            });
-          } else {
-            root.render(<AdIcon ad={NOT_PARAMI_AD} href={href} largeIcon={!isRegularAvatar} />);
-          }
+        if (adInfo.isParamiAd) {
+          chrome.runtime.sendMessage({ method: 'fetchAd', adInfo }, (response) => {
+            const { ad } = response;
+            root.render(<AdIcon ad={ad} href={hyperlink} avatarSrc={avatar.src} largeIcon={!isRegularAvatar} />);
+          });
+        } else {
+          root.render(<AdIcon ad={NOT_PARAMI_AD} href={hyperlink} largeIcon={!isRegularAvatar} />);
         }
       }
     }
@@ -152,8 +113,7 @@ import 'antd/dist/antd.css';
         console.log('Got url change. Clear cache.');
         // clear cache
         nodeMap.clear();
-        imgUrl2Wnft.clear();
-        wnft2href.clear();
+        imgUrl2AdInfoPromise.clear();
       }
     });
 })();

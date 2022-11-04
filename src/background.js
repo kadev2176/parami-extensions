@@ -18,6 +18,8 @@ chrome.storage.sync.set(
   },
 );
 
+const fetchAdPromisesMap = new Map();
+
 (async () => {
   await cryptoWaitReady();
   const provider = new WsProvider(config.socketServer);
@@ -59,7 +61,7 @@ chrome.storage.sync.set(
       const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
       const holderAccounts = await api.query.assets.account.entries(adInfo.nftId);
 
-      resp.data.assetName =  asset.name;
+      resp.data.assetName = asset.name;
       resp.data.numHolders = holderAccounts?.length;
 
       const slotResp = await api.query.ad.slotOf(adInfo.nftId);
@@ -125,11 +127,18 @@ chrome.storage.sync.set(
     (request, sender, sendResponse) => {
       if (request.method === 'fetchAd') {
         chrome.storage.sync.get(['didHex'], res => {
-          fetchAd(request.adInfo, res?.didHex).then(ad => {
+          const { nftId, contractAddress, tokenId } = request.adInfo;
+          const key = `${nftId}${contractAddress}${tokenId}`;
+          
+          if (!fetchAdPromisesMap.has(key)) {
+            fetchAdPromisesMap.set(key, fetchAd(request.adInfo, res?.didHex));
+          }
+
+          fetchAdPromisesMap.get(key).then(ad => {
             sendResponse({
               ad
             });
-          });
+          })
         });
       }
 
@@ -158,8 +167,8 @@ chrome.storage.sync.set(
 // detect tabs change
 chrome.tabs.onUpdated.addListener(
   function (tabId, changeInfo, tab) {
-    console.log('tab change detected', tabId, changeInfo, tab);
     if (changeInfo.url && changeInfo.url.startsWith('https://twitter.com')) {
+      fetchAdPromisesMap.clear();
       chrome.tabs.sendMessage(tabId, {
         method: 'urlChange'
       });

@@ -3,7 +3,7 @@
 
 import { ethers } from 'ethers';
 import hcontract from './ERC721HCollection.json';
-import { MULTI_JUMP_LIMIT, PREFIX_CONTRACT, PREFIX_DID, PREFIX_HTTP, PREFIX_HTTPS, PREFIX_IPFS, PREFIX_IPFS_URL, PREFIX_WNFT, TYPE_ID_2_STRING } from './models';
+import { MULTI_JUMP_LIMIT, PREFIX_CONTRACT, PREFIX_DID, PREFIX_HTTP, PREFIX_HTTPS, PREFIX_IPFS, PREFIX_IPFS_URL, PREFIX_WNFT, TYPE_ID_2_STRING, NFT_RECOGNITION_ENDPOINT } from './models';
 import bs58 from 'bs58';
 
 /* eslint-disable no-bitwise */
@@ -274,7 +274,7 @@ export const solveBin = bin => {
     });
 }
 
-export const parseWnft = image => {
+export const parseHnftInfoFromRingImage = image => {
     const imageData = parse(image);
 
     const bitString = imageData.toString();
@@ -397,7 +397,7 @@ export const parseAdInfoFromUrl = (url) => {
             }
         }
     }
-    
+
     return {
         isParamiAd: false
     };
@@ -405,4 +405,67 @@ export const parseAdInfoFromUrl = (url) => {
 
 export const deleteComma = (value) => {
     return (value ?? '').replace(/,/g, '');
+}
+
+export const queryAdInfoFromAvatar = async (avatarImageSrc, targetUsername, fromUser) => {
+    let hnft;
+
+    // fetch hnft info by recognition
+    const fetchNftResp = await fetch(`${NFT_RECOGNITION_ENDPOINT}?imageUrl=${avatarImageSrc}&targetUser=${targetUsername !== 'photo' ? targetUsername : ''}&fromUser=${fromUser}`);
+    if (fetchNftResp.ok) {
+        const { contractAddress, tokenId } = await fetchNftResp.json();
+        hnft = `${PREFIX_WNFT}${contractAddress}?tokenId=${tokenId}`;
+    }
+
+    // read hnft from ring image
+    if (!hnft) {
+        const uri = new URL(avatarImageSrc);
+        const ext = uri.pathname.split('.').at(-1);
+        const url = `${uri.origin}${uri.pathname
+            .split('_')
+            .slice(0, -1)
+            .join('_')}.${ext}`;
+
+        // eslint-disable-next-line no-await-in-loop
+        const bin = await fetchBin(url);
+        // eslint-disable-next-line no-await-in-loop
+        const img = await solveBin(bin);
+
+        if (img.width < 20) {
+            return {
+                isHnft: false
+            }
+        }
+
+        try {
+            hnft = parseHnftInfoFromRingImage(img);
+        } catch (e) {
+            console.log('[hnft extension error] parse ring image', e);
+            return {
+                isHnft: false
+            }
+        }
+    }
+
+    if (!hnft) {
+        return {
+            isHnft: false
+        }
+    }
+
+    const hyperlink = await parseMetaLink(hnft, 0);
+
+    if (!hyperlink) {
+        return {
+            isHnft: false
+        }
+    }
+
+    const adInfo = parseAdInfoFromUrl(hyperlink);
+
+    return {
+        isHnft: true,
+        adInfo,
+        hyperlink
+    }
 }

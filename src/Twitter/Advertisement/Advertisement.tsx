@@ -2,16 +2,18 @@ import React, { useCallback, useEffect, useState } from 'react';
 import './Advertisement.css';
 import config from '../../config';
 import { formatBalance } from '@polkadot/util';
-import { Tooltip } from 'antd';
+import { message, notification, Tooltip } from 'antd';
 
 const Advertisement: React.FC<{
 	ad: any;
 	claimed: boolean;
 	avatarSrc?: string;
 	userDid?: string;
-}> = ({ ad, avatarSrc, userDid, claimed }) => {
+	clickAction: () => void;
+	onClose: () => void;
+	showCloseIcon: boolean;
+}> = ({ ad, avatarSrc, userDid, claimed, clickAction, onClose, showCloseIcon = false }) => {
 	const [rewardAmount, setRewardAmount] = useState<string>('');
-	const [instructionClicked, setInstructionClicked] = useState<boolean>(false);
 
 	const tags = (ad?.instructions ?? []).map((instruction: any) => instruction.tag).filter(Boolean);
 
@@ -26,8 +28,8 @@ const Advertisement: React.FC<{
 		});
 	}, [userDid])
 
-	const openClaimWindow = () => {
-		window.open(`${config.paramiWallet}/claim/${ad.adId}/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
+	const openClaimWindow = (redirect?: string) => {
+		window.open(`${config.paramiWallet}/claim/${ad.adId}/${ad.nftId}?redirect=${redirect}`, 'Parami Claim', 'popup,width=400,height=600');
 	}
 
 	const openCreateAccountWindow = () => {
@@ -47,6 +49,12 @@ const Advertisement: React.FC<{
 			</>}>
 				<span className='claimInfoMark'><i className="fa-solid fa-circle-exclamation"></i></span>
 			</Tooltip>
+
+			{showCloseIcon && <>
+				<span className='closeIcon' onClick={() => onClose()}>
+					<i className="fa-solid fa-xmark"></i>
+				</span>
+			</>}
 		</div>
 	</>)
 
@@ -116,16 +124,20 @@ const Advertisement: React.FC<{
 										className='adMediaImg'
 									/>
 
-									<div className='mask'>
+									<div className={`mask ${(showCloseIcon && claimed) ? 'pinned' : ''}`}>
 										<div className='infoText'>
-											{!claimed ? 'You will be rewarded' : 'You have already claimed'}
+											{!claimed ? 'You will be rewarded' : 'You have claimed'}
 											<Tooltip title="Rewards are calculated based on your DID preference score">
 												<span className='rewardInfoMark'><i className="fa-solid fa-circle-exclamation"></i></span>
 											</Tooltip>
 										</div>
 
 										<div className='rewardRow'>
-											<div className='rewardInfo'>
+											<div className={`rewardInfo ${claimed ? 'gotoWallet' : ''}`} onClick={() => {
+												if (claimed) {
+													window.open(config.paramiWallet);
+												}
+											}}>
 												<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
 												<span className='rewardAmount'>
 													<span className='rewardNumber'>{rewardAmount ?? '300.00'}</span>
@@ -142,27 +154,42 @@ const Advertisement: React.FC<{
 											{!!userDid && <>
 												{claimed && <>
 													<div className='actionBtn left' onClick={async () => {
-														window.open(`https://twitter.com/intent/tweet?text=Hundreds of Celebrity NFT Powers awaits you to FREE claim! Install and GemHunt on Twitter HERE ❤️ @ParamiProtocol&url=https://chrome.google.com/webstore/detail/parami-hyperlink-nft-exte/gilmlbeecofjmogfkaocnjmbiblmifad`);
+														await navigator.clipboard.writeText(`${config.paramiWallet}/ad/?nftId=${ad.nftId}&referrer=${userDid}`);
+														message.success({
+															content: 'Referral link copied!',
+															style: {
+																marginTop: '20vh',
+																zIndex: 1050
+															},
+														});
 													}}>Share</div>
 													<div className='actionBtn right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Buy more</div>
 												</>}
 
 												{!claimed && <>
-													{instructionClicked && <>
-														<div className='actionBtn' onClick={() => openClaimWindow()}>Claim</div>
-													</>}
-													{!instructionClicked && <>
-														<div className='actionBtn left' onClick={() => openClaimWindow()}>Claim</div>
+													<>
+														<div className='actionBtn left' onClick={() => {
+															clickAction();
+															openClaimWindow();
+														}}>Claim</div>
 														<div className='actionBtn right' onClick={() => {
+															clickAction();
 															const instruction = ad.instructions[0];
-															!!instruction.link && window.open(`https://weekly.parami.io?redirect=${instruction.link}&nftId=${ad.nftId}&did=${userDid}&ad=${ad.adId}&tag=${instruction.tag}&score=${instruction.score}`);
-															setInstructionClicked(true);
+															openClaimWindow(instruction.link);
 														}}>Claim & Learn more</div>
-													</>}
+													</>
 												</>}
 											</>}
 										</div>
 									</div>
+
+									{!(showCloseIcon && claimed) && <>
+										<div className='hoverHint'>
+											<div className='hintIcon'>
+												<i className="fa-solid fa-arrow-up-right-from-square"></i>
+											</div>
+										</div>
+									</>}
 								</div>
 							</>}
 						</div>

@@ -39,6 +39,7 @@
   flex-direction: column;
   flex-grow: 1;
 }
+
 .daoInfoText .daoToken {
   font-size: 14px;
   font-weight: 700;
@@ -74,7 +75,7 @@
 .sponsorInfo {
   width: 100%;
   background: #ffffff;
-  padding: 10px 22px;
+  padding: 10px 16px;
   display: flex;
   flex-direction: row;
   color: #8E8E8E;
@@ -82,8 +83,8 @@
 }
 
 .sponsorInfo .sponsorIcon {
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   margin-right: 4px;
   border: 0.5px solid rgb(230, 230, 230);
@@ -110,8 +111,17 @@
 }
 
 .claimInfoMark {
+  float: left;
+  line-height: 12px;
+}
+
+.closeIcon {
   float: right;
   line-height: 12px;
+  color: #aaaaaa;
+  cursor: pointer;
+  width: 12px;
+  text-align: center;
 }
 
 .claimLink {
@@ -158,11 +168,16 @@
 .posterSection {
   width: 100%;
   position: relative;
+  min-height: 200px;
+  max-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .adMediaImg {
   width: 100%;
-  max-height: 60vh;
+  height: fit-content;
 }
 
 .adDescription {
@@ -194,6 +209,10 @@
   opacity: 0;
 }
 
+.mask.pinned {
+  opacity: 1;
+}
+
 .mask:hover {
   opacity: 1;
 }
@@ -213,6 +232,14 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.rewardInfo.gotoWallet {
+  cursor: pointer;
+}
+
+.rewardInfo.gotoWallet:hover .rewardAmount {
+  text-decoration: underline;
 }
 
 .rewardInfo .kolIcon {
@@ -269,4 +296,27 @@
 
 .actionBtn:hover {
   background: rgba(255, 255, 255, 0.5);
+}
+
+.hoverHint {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}
+
+.hoverHint .hintIcon {
+  float: right;
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px;
+  border-radius: 5px;
+}
+
+.posterSection:hover .hoverHint {
+  display: none;
 }

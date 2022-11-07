@@ -24,3 +24,7 @@ code {
 .ant-popover-inner-content {
   padding: 0 !important;
 }
+
+.ant-message {
+  z-index: 1050 !important;
+}

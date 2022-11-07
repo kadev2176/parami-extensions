@@ -53,7 +53,7 @@ const fetchAdPromisesMap = new Map();
     const resp = {
       success: true,
       data: {
-        nftId: adInfo.nftId,
+        ...adInfo
       }
     }
     try {
@@ -97,10 +97,10 @@ const fetchAdPromisesMap = new Map();
       return {
         success: true,
         data: {
+          ...adInfo,
           ...adJson,
           adId,
           adClaimed,
-          nftId: adInfo.nftId,
           userDid: did,
           assetName: asset.name,
           numHolders: holderAccounts?.length

@@ -290,11 +290,20 @@ export const parseHnftInfoFromRingImage = image => {
 
     if (type === 'wnft') {
         const tokenId = parseInt(bitString.slice(224), 2);
-        return `${PREFIX_WNFT}${address}?tokenId=${tokenId}`;
+        return {
+            contractAddress: address,
+            tokenId,
+            link: `${PREFIX_WNFT}${address}?tokenId=${tokenId}`
+        };
     } else if (type === 'did') {
-        return `${PREFIX_DID}${address}`;
+        return {
+            link: `${PREFIX_DID}${address}`
+        };
     }
-    return '';
+
+    return {
+        link: ''
+    };
 }
 
 export const fromHexString = (hexString) => {
@@ -408,7 +417,7 @@ export const deleteComma = (value) => {
 }
 
 export const queryAdInfoFromAvatar = async (avatarImageSrc, targetUsername, fromUser) => {
-    let hnft;
+    let hnft, contractAddress, tokenId;
 
     // fetch hnft info by recognition
     const fetchNftResp = await fetch(`${NFT_RECOGNITION_ENDPOINT}?imageUrl=${avatarImageSrc}&targetUser=${targetUsername !== 'photo' ? targetUsername : ''}&fromUser=${fromUser}`);
@@ -438,7 +447,10 @@ export const queryAdInfoFromAvatar = async (avatarImageSrc, targetUsername, from
         }
 
         try {
-            hnft = parseHnftInfoFromRingImage(img);
+            const hnftInfo = parseHnftInfoFromRingImage(img);
+            hnft = hnftInfo.link;
+            contractAddress = hnftInfo.contractAddress;
+            tokenId = hnftInfo.tokenId;
         } catch (e) {
             console.log('[hnft extension error] parse ring image', e);
             return {
@@ -465,7 +477,11 @@ export const queryAdInfoFromAvatar = async (avatarImageSrc, targetUsername, from
 
     return {
         isHnft: true,
-        adInfo,
+        adInfo: {
+            contractAddress,
+            tokenId,
+            ...adInfo
+        },
         hyperlink
     }
 }

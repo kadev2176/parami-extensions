@@ -11,7 +11,7 @@
 .ownerInfo {
   padding: 5px;
   height: 22px;
-  background-color: #f8f8f8;
+  background-color: #eeeeee;
   color: #BEBEBE;
 }
 
@@ -102,6 +102,11 @@
   color: #3c3c3c;
   font-weight: 700;
   margin-right: 4px;
+}
+
+.rewardInfoMark {
+  margin-left: 4px;
+  color: #dadada;
 }
 
 .claimInfoMark {

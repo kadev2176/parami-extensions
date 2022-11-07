@@ -37,10 +37,12 @@ const Advertisement: React.FC<{
 	const sponsorName = ad?.sponsorName ?? 'Parami';
 	const abbreviation = sponsorName.startsWith('did:') ? `did:...${sponsorName.slice(-4)}` : null;
 
+	const hNFT = (ad?.contractAddress && ad?.tokenId ? <a href={`https://opensea.io/assets/ethereum/${ad.contractAddress}/${ad.tokenId}`} target="_blank">hNFT</a> : 'hNFT');
+
 	const claimInfoMark = (<>
 		<div className='ownerInfo'>
 			<Tooltip title={<>
-				<span>📢 This hNFT is reserved.</span>
+				<span>📢 This {hNFT} is reserved.</span>
 				<a className='claimLink' href={`${config.paramiWallet}/claimHnft/${ad.nftId}`} target='_blank'>I am the owner</a>
 			</>}>
 				<span className='claimInfoMark'><i className="fa-solid fa-circle-exclamation"></i></span>
@@ -65,12 +67,12 @@ const Advertisement: React.FC<{
 								</div>
 							</div>
 						</div>
-						<div className='bidSectionInfo'>{`There is nothing linked to ${ad?.assetName} NFT...`}</div>
+						<div className='bidSectionInfo'>{`There is nothing linked to ${ad?.assetName}`} {hNFT}...</div>
 						<div className='bidSectionBtnContainer'>
 							<div className='actionBtn left' onClick={async () => {
 								window.open(`${config.paramiWallet}/bid/${ad.nftId}`);
 							}}>Place an Ad</div>
-							<div className='actionBtn right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Sponsor more</div>
+							<div className='actionBtn right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Buy more</div>
 						</div>
 					</div>
 				</>}
@@ -92,7 +94,7 @@ const Advertisement: React.FC<{
 									{sponsorName}
 								</span>
 							</>}
-							<span>is sponsoring this hNFT. </span>
+							<span>is sponsoring this {hNFT}. </span>
 							<a className='bidLink' href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">Bid on this ad space</a>
 						</span>
 					</div>
@@ -115,9 +117,12 @@ const Advertisement: React.FC<{
 									/>
 
 									<div className='mask'>
-										<div className='infoText'>{
-											!claimed ? 'You will be rewarded:' : 'You have already claimed:'
-										}</div>
+										<div className='infoText'>
+											{!claimed ? 'You will be rewarded' : 'You have already claimed'}
+											<Tooltip title="Rewards are calculated based on your DID preference score">
+												<span className='rewardInfoMark'><i className="fa-solid fa-circle-exclamation"></i></span>
+											</Tooltip>
+										</div>
 
 										<div className='rewardRow'>
 											<div className='rewardInfo'>
@@ -139,7 +144,7 @@ const Advertisement: React.FC<{
 													<div className='actionBtn left' onClick={async () => {
 														window.open(`https://twitter.com/intent/tweet?text=Hundreds of Celebrity NFT Powers awaits you to FREE claim! Install and GemHunt on Twitter HERE ❤️ @ParamiProtocol&url=https://chrome.google.com/webstore/detail/parami-hyperlink-nft-exte/gilmlbeecofjmogfkaocnjmbiblmifad`);
 													}}>Share</div>
-													<div className='actionBtn right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Sponsor more</div>
+													<div className='actionBtn right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Buy more</div>
 												</>}
 
 												{!claimed && <>

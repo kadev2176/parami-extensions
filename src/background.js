@@ -25,7 +25,7 @@ const fetchAdPromisesMap = new Map();
   const provider = new WsProvider(config.socketServer);
   const api = await ApiPromise.create({
     provider,
-    // rpc: config.rpc,
+    rpc: config.rpc,
     runtime: config.runtime
   });
 
@@ -64,6 +64,21 @@ const fetchAdPromisesMap = new Map();
       resp.data.assetName = asset.name;
       resp.data.numHolders = holderAccounts?.length;
 
+      const header = await api.rpc.chain.getHeader();
+      const blockHash = await api.rpc.chain.getBlockHash(header.number - (24 * 60 * 60) / 12);
+
+      const value = await api.rpc.swap.drylySellTokens(adInfo.nftId, '1'.padEnd(18, '0'));
+      const tokenPrice = value.toHuman();
+
+      let preTokenPrice;
+      try {
+        const preValue = await api.rpc.swap.drylySellTokens(adInfo.nftId, '1'.padEnd(18, '0'), blockHash);
+        preTokenPrice = preValue.toHuman();
+      } catch (_) {}
+
+      resp.data.tokenPrice = tokenPrice;
+      resp.data.preTokenPrice = preTokenPrice;
+
       const slotResp = await api.query.ad.slotOf(adInfo.nftId);
 
       if (slotResp.isEmpty) {
@@ -87,12 +102,6 @@ const fetchAdPromisesMap = new Map();
       }
 
       const adClaimed = did ? !(await api.query.ad.payout(adId, did)).isEmpty : false;
-      // const assetInfo = await api.query.assets.metadata(Number(deleteComma(adInfo.nftId)));
-      // const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
-      // const holderAccounts = await api.query.assets.account.entries(adInfo.nftId);
-
-      // const value = await api.rpc.swap.drylySellTokens(deleteComma(tokenAssetId), '1'.padEnd(18, '0'));
-      // const tokenPrice = value.toHuman();
 
       return {
         success: true,
@@ -129,7 +138,7 @@ const fetchAdPromisesMap = new Map();
         chrome.storage.sync.get(['didHex'], res => {
           const { nftId, contractAddress, tokenId } = request.adInfo;
           const key = `${nftId}${contractAddress}${tokenId}`;
-          
+
           if (!fetchAdPromisesMap.has(key)) {
             fetchAdPromisesMap.set(key, fetchAd(request.adInfo, res?.didHex));
           }

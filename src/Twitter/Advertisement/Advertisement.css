@@ -49,6 +49,47 @@
   color: #929292;
 }
 
+.tokenPrice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.tokenPrice .price {
+  color: #424242;
+  margin-top: 2px;
+}
+
+.tokenPrice .change {
+  color: #ffffff;
+  text-align: center;
+  border-radius: 4px;
+  width: fit-content;
+  padding: 0 4px;
+  display: flex;
+  font-weight: 500;
+  margin-top: -2px;
+}
+
+.tokenPrice .change.flat,
+.tokenPrice .change.up {
+  background: rgb(3, 166, 109);
+}
+
+.tokenPrice .change.down {
+  background: #CF304A;
+}
+
+.tokenPrice .change .priceChangeIcon {
+  margin-right: 4px;
+  display: flex;
+  align-items: center;
+}
+.tokenPrice .change .priceChangeText {
+  line-height: 19px;
+}
+
 .bidSectionInfo {
   text-align: center;
   padding: 10px;
@@ -178,6 +219,7 @@
 .adMediaImg {
   width: 100%;
   height: fit-content;
+  max-height: 50vh;
 }
 
 .adDescription {

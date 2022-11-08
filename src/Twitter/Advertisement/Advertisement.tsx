@@ -14,17 +14,34 @@ const Advertisement: React.FC<{
 	showCloseIcon: boolean;
 }> = ({ ad, avatarSrc, userDid, claimed, clickAction, onClose, showCloseIcon = false }) => {
 	const [rewardAmount, setRewardAmount] = useState<string>('');
+	const [priceInfo, setPriceInfo] = useState<{ price: string, change: number }>();
 
 	const tags = (ad?.instructions ?? []).map((instruction: any) => instruction.tag).filter(Boolean);
+
+	const parseBalance = (amount: string) => {
+		const amountWithUnit = formatBalance(amount, { withUnit: false, decimals: 18 });
+		const [price, unit] = amountWithUnit.split(' ');
+		return `${parseFloat(price).toFixed(2)}${unit ? ` ${unit}` : ''}`;
+	}
+
+	useEffect(() => {
+		if (!ad?.id) {
+			const price = `${parseBalance(ad.tokenPrice)}AD3`;
+			let change
+			if (ad.preTokenPrice) {
+				change = Number((BigInt(ad.tokenPrice) - BigInt(ad.preTokenPrice)) * BigInt(10000) / BigInt(ad.preTokenPrice)) / 100;
+			}
+			setPriceInfo({
+				price,
+				change: change ?? 0
+			})
+		}
+	}, [ad])
 
 	useEffect(() => {
 		chrome.runtime.sendMessage({ method: 'calReward', adId: ad.adId, nftId: ad.nftId, did: userDid }, (response) => {
 			const { rewardAmount } = response ?? {};
-
-			const amountWithUnit = formatBalance(rewardAmount, { withUnit: false, decimals: 18 });
-			const [price, unit] = amountWithUnit.split(' ');
-			const amount = `${parseFloat(price).toFixed(2)}${unit ? ` ${unit}` : ''}`;
-			setRewardAmount(amount);
+			setRewardAmount(parseBalance(rewardAmount));
 		});
 	}, [userDid])
 
@@ -74,6 +91,42 @@ const Advertisement: React.FC<{
 									{ad?.numHolders} holders
 								</div>
 							</div>
+							{priceInfo && <>
+								<div className='tokenPrice'>
+									<div className='price'>~{priceInfo.price}</div>
+									{priceInfo.change === 0 && <>
+										<div className='change flat'>
+											<span className='priceChangeIcon'>
+												<i className="fa-solid fa-caret-up"></i>
+											</span>
+											<span className='priceChangeText'>
+												+0.00%
+											</span>
+										</div>
+									</>}
+									{priceInfo.change > 0 && <>
+										<div className='change up'>
+											<span className='priceChangeIcon'>
+												<i className="fa-solid fa-caret-up"></i>
+											</span>
+											<span className='priceChangeText'>
+												+{priceInfo.change.toFixed(2)}%
+											</span>
+										</div>
+									</>}
+									{priceInfo.change < 0 && <>
+										<div className='change down'>
+											<span className='priceChangeIcon'>
+												<i className="fa-solid fa-caret-down"></i>
+											</span>
+											<span className='priceChangeText'>
+												{priceInfo.change.toFixed(2)}%
+											</span>
+										</div>
+									</>}
+								</div>
+							</>}
+
 						</div>
 						<div className='bidSectionInfo'>{`There is nothing linked to ${ad?.assetName}`} {hNFT}...</div>
 						<div className='bidSectionBtnContainer'>

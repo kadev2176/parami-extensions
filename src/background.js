@@ -20,6 +20,20 @@ chrome.storage.sync.set(
 
 const fetchAdPromisesMap = new Map();
 
+const doGraghQuery = async (query) => {
+  const obj = {};
+  obj.operationName = null;
+  obj.variables = {};
+  obj.query = query;
+  return fetch(config.subqueryServer, {
+    "headers": {
+      "content-type": "application/json",
+    },
+    "body": JSON.stringify(obj),
+    "method": "POST"
+  });
+};
+
 (async () => {
   await cryptoWaitReady();
   const provider = new WsProvider(config.socketServer);
@@ -59,10 +73,18 @@ const fetchAdPromisesMap = new Map();
     try {
       const assetInfo = await api.query.assets.metadata(adInfo.nftId);
       const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
-      const holderAccounts = await api.query.assets.account.entries(adInfo.nftId);
 
+      const query = `
+        query {
+          members(filter: {assetId: {equalTo: "${adInfo.nftId}"}}) {
+            totalCount
+          }
+        }
+      `
+      const holderAccountsRes = await doGraghQuery(query);
+      const holderAccounts = (await holderAccountsRes.json());
       resp.data.assetName = asset.name;
-      resp.data.numHolders = holderAccounts?.length;
+      resp.data.numHolders = holderAccounts?.data?.members?.totalCount;
 
       const header = await api.rpc.chain.getHeader();
       const blockHash = await api.rpc.chain.getBlockHash(header.number - (24 * 60 * 60) / 12);
@@ -74,7 +96,7 @@ const fetchAdPromisesMap = new Map();
       try {
         const preValue = await api.rpc.swap.drylySellTokens(adInfo.nftId, '1'.padEnd(18, '0'), blockHash);
         preTokenPrice = preValue.toHuman();
-      } catch (_) {}
+      } catch (_) { }
 
       resp.data.tokenPrice = tokenPrice;
       resp.data.preTokenPrice = preTokenPrice;

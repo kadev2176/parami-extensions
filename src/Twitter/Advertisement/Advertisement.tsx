@@ -45,8 +45,8 @@ const Advertisement: React.FC<{
 		});
 	}, [userDid])
 
-	const openClaimWindow = (redirect?: string) => {
-		window.open(`${config.paramiWallet}/claim/${ad.adId}/${ad.nftId}?redirect=${redirect}`, 'Parami Claim', 'popup,width=400,height=600');
+	const openClaimWindow = (redirect?: boolean) => {
+		window.open(`${config.paramiWallet}/adClaim/${ad.adId}/${ad.nftId}?redirect=${redirect}`, 'Parami Claim', 'popup,width=400,height=600');
 	}
 
 	const openCreateAccountWindow = () => {
@@ -128,7 +128,7 @@ const Advertisement: React.FC<{
 							</>}
 
 						</div>
-						<div className='bidSectionInfo'>{`There is nothing linked to ${ad?.assetName}`} {hNFT}...</div>
+						<div className='bidSectionInfo'>{`${ad?.assetName} `}{hNFT}{` is available to be hyperlinked...`}</div>
 						<div className='bidSectionBtnContainer'>
 							<div className='actionBtn left' onClick={async () => {
 								window.open(`${config.paramiWallet}/bid/${ad.nftId}`);
@@ -227,8 +227,7 @@ const Advertisement: React.FC<{
 														}}>Claim</div>
 														<div className='actionBtn right' onClick={() => {
 															clickAction();
-															const instruction = ad.instructions[0];
-															openClaimWindow(instruction.link);
+															openClaimWindow(true);
 														}}>Claim & Learn more</div>
 													</>
 												</>}

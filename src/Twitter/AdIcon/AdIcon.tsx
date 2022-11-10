@@ -3,6 +3,7 @@ import './AdIcon.css';
 import { Popover, Card } from 'antd';
 import { useState } from 'react';
 import Advertisement from '../Advertisement/Advertisement';
+import { POST_MESSAGE_PREFIX } from '../../models';
 
 export interface AdIconProps {
     href: string;
@@ -29,6 +30,8 @@ function AdIcon({ href, ad, avatarSrc, largeIcon }: AdIconProps) {
     const [adClaimed, setAdClaimed] = useState<boolean>(false);
     const [userDid, setUserDid] = useState<string>();
     const [retryCounter, setRetryCounter] = useState<number>(0);
+    const [trigger, setTrigger] = useState<string>('hover');
+    const [open, setOpen] = useState<boolean>(false);
 
     const retry = (adInfo: { nftId?: string; contractAddress?: string; tokenId?: string }) => {
         if (retryCounter < MAX_RETRY_COUNT) {
@@ -49,8 +52,34 @@ function AdIcon({ href, ad, avatarSrc, largeIcon }: AdIconProps) {
         }
     }, [adResult])
 
+    const handleClickAction = () => {
+        setTrigger('click');
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+        setTrigger('hover');
+    }
+
+    const handlePopoverOpen = (open: boolean) => {
+        setOpen(open);
+        if (!open) {
+            setTrigger('hover');
+        }
+    }
+
     const content = (
-        adData ? <Advertisement ad={adData} avatarSrc={avatarSrc} userDid={userDid} claimed={adClaimed} ></Advertisement> : null
+        adData
+            ? <Advertisement
+                ad={adData}
+                avatarSrc={avatarSrc}
+                userDid={userDid}
+                claimed={adClaimed}
+                clickAction={handleClickAction}
+                onClose={handleClose}
+                showCloseIcon={trigger === 'click'}
+            ></Advertisement>
+            : null
     );
 
     useEffect(() => {
@@ -64,10 +93,10 @@ function AdIcon({ href, ad, avatarSrc, largeIcon }: AdIconProps) {
 
     useEffect(() => {
         window.addEventListener('message', (event) => {
-            if (event.origin !== 'https://app.parami.io') {
+            if (event.origin !== 'https://app.parami.io' && event.origin !== 'https://twitter.com') {
                 return;
             }
-            if (event.data && event.data.startsWith('AdClaimed:')) {
+            if (event.data && event.data.startsWith(POST_MESSAGE_PREFIX.AD_CLAIMED)) {
                 const adId = event.data.slice(10);
                 if (adId === adData?.adId) {
                     setAdClaimed(true);
@@ -91,7 +120,7 @@ function AdIcon({ href, ad, avatarSrc, largeIcon }: AdIconProps) {
         </>}
 
         {content && <>
-            <Popover content={content} placement="rightTop" className='ad-popover'>
+            <Popover content={content} placement="rightTop" className='ad-popover' trigger={trigger} onOpenChange={handlePopoverOpen} open={open}>
                 <span className={`pfp-link-badge ${adData?.adId ? 'ad-icon' : 'default-icon'} ${largeIcon ? 'large-icon' : ''}`}>
                     {adData?.adId && <span className='img-container'>
                         <img referrerPolicy='no-referrer' src={adData?.icon ?? defaultAdIcon}></img>

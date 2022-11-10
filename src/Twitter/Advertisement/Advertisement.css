@@ -4,34 +4,120 @@
   font-size: 12px;
   border: 1px solid #e4e4e4;
   margin-top: -40px;
+  overflow: hidden;
+  border-radius: 10px;
 }
 
 .ownerInfo {
-  padding: 4px 22px;
-  background-color: rgba(255, 124, 51, 0.15);
-  color: #746D6D;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  padding: 5px;
+  height: 22px;
+  background-color: #eeeeee;
+  color: #BEBEBE;
 }
 
 .bidSection {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 5px 22px;
+  flex-direction: column;
+  padding: 10px;
+  width: 100%;
 }
 
-.bidSection .kolIcon {
+.daoInfo {
+  display: flex;
+  flex-direction: row;
+}
+
+.daoInfo .kolIcon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   margin-right: 10px;
 }
 
+.daoInfoText {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.daoInfoText .daoToken {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.daoInfoText .daoHolderNumber {
+  color: #929292;
+}
+
+.tokenPrice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.tokenPrice .price {
+  color: #424242;
+  margin-top: 2px;
+}
+
+.tokenPrice .change {
+  color: #ffffff;
+  text-align: center;
+  border-radius: 4px;
+  width: fit-content;
+  padding: 0 4px;
+  display: flex;
+  font-weight: 500;
+  margin-top: -2px;
+}
+
+.tokenPrice .change.flat,
+.tokenPrice .change.up {
+  background: rgb(3, 166, 109);
+}
+
+.tokenPrice .change.down {
+  background: #CF304A;
+}
+
+.tokenPrice .change .priceChangeIcon {
+  margin-right: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.tokenPrice .change .priceChangeText {
+  line-height: 19px;
+}
+
+.bidSectionInfo {
+  text-align: center;
+  padding: 10px;
+  color: #b1b1b1;
+}
+
+.bidSectionBtnContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
+.bidSectionBtnContainer .actionBtn {
+  background: #000000;
+  color: #ffffff;
+  text-align: center;
+  min-width: 120px;
+}
+
+.bidSectionBtnContainer .actionBtn:hover {
+  background: #3c3c3c;
+}
+
 .sponsorInfo {
+  width: 100%;
   background: #ffffff;
-  padding: 10px 22px;
+  padding: 10px 16px;
   display: flex;
   flex-direction: row;
   color: #8E8E8E;
@@ -39,8 +125,8 @@
 }
 
 .sponsorInfo .sponsorIcon {
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   margin-right: 4px;
   border: 0.5px solid rgb(230, 230, 230);
@@ -61,23 +147,23 @@
   margin-right: 4px;
 }
 
-.bidBtn {
-  color: rgb(15, 20, 25);
-  font-weight: 700;
-  background: #ffffff;
-  border: 1px solid rgb(207, 217, 222);
-
-  height: 20px;
-  font-size: 12px;
-  line-height: 20px;
-  border-radius: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
-  cursor: pointer;
+.rewardInfoMark {
+  margin-left: 4px;
+  color: #dadada;
 }
 
-.bidBtn:hover {
-  background: #cbcbcb;
+.claimInfoMark {
+  float: left;
+  line-height: 12px;
+}
+
+.closeIcon {
+  float: right;
+  line-height: 12px;
+  color: #aaaaaa;
+  cursor: pointer;
+  width: 12px;
+  text-align: center;
 }
 
 .claimLink {
@@ -88,12 +174,7 @@
 .adSection {
   position: relative;
   margin: 0 5px;
-}
-
-.adBubble {
-  width: 100%;
-  height: 100%;
-  position: absolute;
+  margin-bottom: 5px;
 }
 
 .adSectionArrow {
@@ -107,9 +188,11 @@
   background: #ffffff;
   border-radius: 5px;
 }
+
 .adSectionArrow.back {
-  border: 1px solid #dadada;
+  border: 1px solid rgb(200, 200, 200);
 }
+
 .adSectionArrow.front {
   top: -4px;
   z-index: 3;
@@ -120,13 +203,24 @@
   border-radius: 10px;
   overflow: hidden;
   z-index: 2;
-  border: 1px solid #dadada;
+  border: 1px solid rgb(207, 217, 222);
   background: #ffffff;
+}
+
+.posterSection {
+  width: 100%;
+  position: relative;
+  min-height: 200px;
+  max-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .adMediaImg {
   width: 100%;
-  max-height: 60vh;
+  height: fit-content;
+  max-height: 50vh;
 }
 
 .adDescription {
@@ -144,26 +238,55 @@
   margin-right: 5px;
 }
 
-.divider {
+.mask {
+  position: absolute;
+  top: 0;
   width: 100%;
-  height: 0px;
-  background: #dadada;
-  margin: 5px 0;
+  height: 100%;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  opacity: 0;
 }
 
-.claimSection {
-  padding: 8px 22px;
-  padding-top: 0;
+.mask.pinned {
+  opacity: 1;
 }
 
-.claimSection .infoText {
-  color: #939393;
+.mask:hover {
+  opacity: 1;
+}
+
+.mask .confettiContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  z-index: 0;
+  opacity: 0;
+}
+
+.mask.pinned .confettiContainer {
+  opacity: 1;
+}
+
+.mask .infoText,
+.mask .rewardRow,
+.mask .btnContainer {
+  z-index: 1;
+}
+
+.mask .infoText {
+  padding: 10px 60px;
 }
 
 .rewardRow {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
@@ -173,16 +296,26 @@
   align-items: center;
 }
 
+.rewardInfo.gotoWallet {
+  cursor: pointer;
+}
+
+.rewardInfo.gotoWallet:hover .rewardAmount {
+  text-decoration: underline;
+}
+
 .rewardInfo .kolIcon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  border: 3px dashed #ffffff;
   margin-right: 6px;
 }
 
 .rewardInfo .rewardAmount {
   display: flex;
   flex-direction: column;
+  margin-right: 20px;
 }
 
 .rewardInfo .rewardNumber {
@@ -195,84 +328,10 @@
   font-weight: 700;
 }
 
-.rewardRow .buttons {
+.rewardRow .claimedIcon {
+  font-size: 24px;
+  color: #16C784;
   display: flex;
-  font-size: 12px;
-  transform: scale(0.9);
-  transform-origin: 100% center;
-  white-space: nowrap;
-}
-
-.actionBtn {
-  color: #ffffff;
-  font-weight: 700;
-  background: rgb(15, 20, 25);
-  cursor: pointer;
-  padding: 4px 10px;
-}
-
-.actionBtn:hover {
-  background: rgba(15, 20, 25, 0.8);
-}
-
-.claimBtn {
-  border-radius: 13px 0 0 13px;
-  margin-right: 2px;
-}
-
-.instructionsBtn {
-  border-radius: 0 13px 13px 0;
-}
-
-.noDidSection {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 10px;
-}
-
-.createDidBtn {
-  border-radius: 13px;
-}
-
-.instructionSection .instruction {
-  border: 1px solid #dadada;
-  cursor: pointer;
-  display: flex;
-  flex-direction: row;
-  border-radius: 19px;
-  align-items: center;
-  padding: 4px 8px;
-}
-
-.instructionSection .instruction:hover {
-  background: #f3f3f3;
-}
-
-.instructionSection .instruction+.instruction {
-  margin-top: 8px;
-}
-
-.instructionSection .instruction .instructionText {
-  flex-grow: 1;
-  color: #717171;
-}
-
-.instructionTag {
-  white-space: nowrap;
-  margin-right: 4px;
-}
-
-.instructionTag,
-.instructionScore {
-  font-size: 14px;
-  font-weight: 700;
-  color: #000000;
-}
-
-.instructionTitle {
-  margin-bottom: 5px;
-  color: #939393;
 }
 
 .btnContainer {
@@ -280,10 +339,10 @@
   flex-direction: row;
   justify-content: center;
   text-align: center;
-  padding-top: 8px;
+  padding: 20px;
 }
 
-.actionBtnBig {
+.actionBtn {
   min-width: 100px;
   color: #ffffff;
   font-weight: 700;
@@ -291,16 +350,41 @@
   padding: 6px 10px;
   width: fit-content;
   border-radius: 15px;
-  background: #ff5b00;
+  background: rgba(255, 255, 255, 0.3);
 }
-.actionBtnBig.left {
+
+.actionBtn.left {
   border-radius: 15px 0 0 15px;
   margin-right: 1px;
 }
-.actionBtnBig.right {
+
+.actionBtn.right {
   border-radius: 0 15px 15px 0;
 }
 
-.actionBtnBig:hover {
-  background: #ff7c33;
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.hoverHint {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}
+
+.hoverHint .hintIcon {
+  float: right;
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px;
+  border-radius: 5px;
+}
+
+.posterSection:hover .hoverHint {
+  display: none;
 }

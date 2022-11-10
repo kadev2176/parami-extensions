@@ -1,61 +1,189 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Advertisement.css';
 import config from '../../config';
-import { formatBalance } from '@polkadot/util';
-import { Tooltip } from 'antd';
+import { message, Spin, Tooltip } from 'antd';
+import { POST_MESSAGE_PREFIX } from '../../models';
+import { LoadingOutlined } from '@ant-design/icons';
+import { parseBalance } from '../util';
+import Confetti from '../Confetti/Confetti';
 
 const Advertisement: React.FC<{
 	ad: any;
 	claimed: boolean;
 	avatarSrc?: string;
 	userDid?: string;
-}> = ({ ad, avatarSrc, userDid, claimed }) => {
+	clickAction: () => void;
+	onClose: () => void;
+	showCloseIcon: boolean;
+}> = ({ ad, avatarSrc, userDid, claimed, clickAction, onClose, showCloseIcon = false }) => {
 	const [rewardAmount, setRewardAmount] = useState<string>('');
-	const [claimText, setClaimText] = useState<string>('Not interested, claim it now');
+	const [priceInfo, setPriceInfo] = useState<{ price: string, change: number }>();
+	const [claiming, setClaiming] = useState<boolean>(false);
 
 	const tags = (ad?.instructions ?? []).map((instruction: any) => instruction.tag).filter(Boolean);
+	const justClaimed = showCloseIcon && claimed;
+
+	useEffect(() => {
+		if (!ad?.id) {
+			const price = `${parseBalance(ad.tokenPrice)}AD3`;
+			let change
+			if (ad.preTokenPrice) {
+				change = Number((BigInt(ad.tokenPrice) - BigInt(ad.preTokenPrice)) * BigInt(10000) / BigInt(ad.preTokenPrice)) / 100;
+			}
+			setPriceInfo({
+				price,
+				change: change ?? 0
+			})
+		}
+	}, [ad])
 
 	useEffect(() => {
 		chrome.runtime.sendMessage({ method: 'calReward', adId: ad.adId, nftId: ad.nftId, did: userDid }, (response) => {
 			const { rewardAmount } = response ?? {};
-
-			const amountWithUnit = formatBalance(rewardAmount, { withUnit: false, decimals: 18 });
-			const [price, unit] = amountWithUnit.split(' ');
-			const amount = `${parseFloat(price).toFixed(2)}${unit ? ` ${unit}` : ''}`;
-			setRewardAmount(amount);
+			setRewardAmount(parseBalance(rewardAmount));
 		});
 	}, [userDid])
 
-	const openClaimWindow = () => {
-		window.open(`${config.paramiWallet}/claim/${ad.adId}/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
+	const openClaimWindow = (redirect?: boolean) => {
+		window.open(`${config.paramiWallet}/adClaim/${ad.adId}/${ad.nftId}${redirect ? '?redirect=true' : ''}`, 'Parami Claim', 'popup,width=400,height=600');
 	}
 
 	const openCreateAccountWindow = () => {
 		window.open(`${config.paramiWallet}/create/popup`, 'Parami Create DID', 'popup,width=400,height=600');
 	}
 
+	const claim = async (redirect: boolean) => {
+		setClaiming(true);
+		try {
+			const instruction = ad.instructions[0];
+			if (redirect && instruction) {
+				window.open(decodeURIComponent(instruction.link));
+			}
+
+			const body = {
+				adId: ad.adId,
+				nftId: ad.nftId,
+				did: userDid,
+				score: {
+					tag: instruction?.tag,
+					score: redirect ? instruction?.score : -5
+				}
+			};
+
+			const res = await fetch(`https://weekly.parami.io/api/pay`, {
+				"headers": {
+					"content-type": "application/json",
+				},
+				"body": JSON.stringify(body),
+				"method": "POST",
+			});
+
+			setClaiming(false);
+
+			if (res.ok) {
+				window.postMessage(`${POST_MESSAGE_PREFIX.AD_CLAIMED}:${ad.adId}`, '*');
+			} else {
+				message.error({
+					content: 'Network Error. Please try again later.'
+				})
+			}
+		} catch (e) {
+			console.log('HNFT extension claiming error', e);
+			setClaiming(false);
+			message.error({
+				content: 'Network Error. Please try again later.'
+			})
+		}
+
+	}
+
 	const sponsorName = ad?.sponsorName ?? 'Parami';
 	const abbreviation = sponsorName.startsWith('did:') ? `did:...${sponsorName.slice(-4)}` : null;
+
+	const hNFT = (ad?.contractAddress && ad?.tokenId ? <a href={`https://opensea.io/assets/ethereum/${ad.contractAddress}/${ad.tokenId}`} target="_blank">hNFT</a> : 'hNFT');
+
+	const claimInfoMark = (<>
+		<div className='ownerInfo'>
+			<Tooltip title={<>
+				<span>📢 This {hNFT} is reserved.</span>
+				<a className='claimLink' href={`${config.paramiWallet}/claimHnft/${ad.nftId}`} target='_blank'>I am the owner</a>
+			</>}>
+				<span className='claimInfoMark'><i className="fa-solid fa-circle-exclamation"></i></span>
+			</Tooltip>
+
+			{showCloseIcon && <>
+				<span className='closeIcon' onClick={() => onClose()}>
+					<i className="fa-solid fa-xmark"></i>
+				</span>
+			</>}
+		</div>
+	</>)
 
 	return (
 		<>
 			<div className='advertisementContainer'>
 				{!ad?.adId && <>
-					<div className='ownerInfo'>
-						<span>📢 This hNFT is reserved.</span>
-						<a className='claimLink' href={`${config.paramiWallet}/claimHnft/${ad.nftId}`} target='_blank'>I am the owner</a>
-					</div>
+					{claimInfoMark}
 					<div className='bidSection'>
-						<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
-						<a href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank" className='bidLink'>Bid on this ad space</a>
+						<div className='daoInfo'>
+							<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
+							<div className='daoInfoText'>
+								<div className='daoToken'>
+									{ad?.assetName} NFT Power
+								</div>
+								<div className='daoHolderNumber'>
+									{ad?.numHolders} holders
+								</div>
+							</div>
+							{priceInfo && <>
+								<div className='tokenPrice'>
+									<div className='price'>~{priceInfo.price}</div>
+									{priceInfo.change === 0 && <>
+										<div className='change flat'>
+											<span className='priceChangeIcon'>
+												<i className="fa-solid fa-caret-up"></i>
+											</span>
+											<span className='priceChangeText'>
+												+0.00%
+											</span>
+										</div>
+									</>}
+									{priceInfo.change > 0 && <>
+										<div className='change up'>
+											<span className='priceChangeIcon'>
+												<i className="fa-solid fa-caret-up"></i>
+											</span>
+											<span className='priceChangeText'>
+												+{priceInfo.change.toFixed(2)}%
+											</span>
+										</div>
+									</>}
+									{priceInfo.change < 0 && <>
+										<div className='change down'>
+											<span className='priceChangeIcon'>
+												<i className="fa-solid fa-caret-down"></i>
+											</span>
+											<span className='priceChangeText'>
+												{priceInfo.change.toFixed(2)}%
+											</span>
+										</div>
+									</>}
+								</div>
+							</>}
+
+						</div>
+						<div className='bidSectionInfo'>{`${ad?.assetName} `}{hNFT}{` is available to be hyperlinked...`}</div>
+						<div className='bidSectionBtnContainer'>
+							<div className='actionBtn left' onClick={async () => {
+								window.open(`${config.paramiWallet}/bid/${ad.nftId}`);
+							}}>Place an Ad</div>
+							<div className='actionBtn right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Buy more</div>
+						</div>
 					</div>
 				</>}
 
 				{!!ad?.adId && <>
-					<div className='ownerInfo'>
-						<span>📢 This hNFT is reserved.</span>
-						<a className='claimLink' href={`${config.paramiWallet}/claimHnft/${ad.nftId}`} target='_blank'>I am the owner</a>
-					</div>
+					{claimInfoMark}
 					<div className='sponsorInfo'>
 						{ad?.icon && <img referrerPolicy='no-referrer' className='sponsorIcon' src={ad?.icon}></img>}
 						<span className='sponsorText'>
@@ -71,7 +199,7 @@ const Advertisement: React.FC<{
 									{sponsorName}
 								</span>
 							</>}
-							<span>is sponsoring this hNFT. </span>
+							<span>is sponsoring this {hNFT}. </span>
 							<a className='bidLink' href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">Bid on this ad space</a>
 						</span>
 					</div>
@@ -86,80 +214,99 @@ const Advertisement: React.FC<{
 								</span>}
 							</div>
 							{ad?.media && <>
-								<img
-									src={ad?.media}
-									referrerPolicy='no-referrer'
-									className='adMediaImg'
-								/>
+								<Spin spinning={claiming} indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} tip="Claiming...">
+									<div className='posterSection'>
+										<img
+											src={ad?.media}
+											referrerPolicy='no-referrer'
+											className='adMediaImg'
+										/>
+
+										<div className={`mask ${justClaimed ? 'pinned' : ''}`}>
+											<div className={`confettiContainer`}>
+												<Confetti />
+											</div>
+
+											<div className='infoText'>
+												{!claimed ? 'You will be rewarded' : 'You have claimed'}
+												<Tooltip title="Rewards are calculated based on your DID preference score">
+													<span className='rewardInfoMark'><i className="fa-solid fa-circle-exclamation"></i></span>
+												</Tooltip>
+											</div>
+
+											<div className='rewardRow'>
+												<div className={`rewardInfo ${claimed ? 'gotoWallet' : ''}`} onClick={() => {
+													if (claimed) {
+														window.open(config.paramiWallet);
+													}
+												}}>
+													<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
+													<span className='rewardAmount'>
+														<span className='rewardNumber'>{rewardAmount ?? '300.00'}</span>
+														<span className='rewardToken'>{ad?.assetName} NFT Power</span>
+													</span>
+												</div>
+
+												{claimed && <>
+													<div className='claimedIcon'>
+														<i className="fa-solid fa-circle-check"></i>
+													</div>
+												</>}
+											</div>
+
+											<div className='btnContainer'>
+												{!userDid && <>
+													<div className='actionBtn' onClick={() => openCreateAccountWindow()}>Create DID and claim!</div>
+												</>}
+
+												{!!userDid && <>
+													{claimed && <>
+														<div className='actionBtn left' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Buy more</div>
+														<div className='actionBtn right' onClick={async () => {
+															await navigator.clipboard.writeText(`${config.paramiWallet}/ad/?nftId=${ad.nftId}&referrer=${userDid}`);
+															message.success({
+																content: 'Referral link copied!',
+																style: {
+																	marginTop: '20vh',
+																	zIndex: 1050
+																},
+															});
+														}}>Share & Earn more</div>
+													</>}
+
+													{!claimed && <>
+														<>
+															<div className='actionBtn left' onClick={() => {
+																clickAction();
+																claim(false);
+															}}>Claim</div>
+															<div className='actionBtn right' onClick={() => {
+																clickAction();
+																claim(true);
+															}}>Claim & Learn more</div>
+														</>
+													</>}
+												</>}
+											</div>
+										</div>
+
+
+
+										{!(showCloseIcon && claimed) && <>
+											<div className='hoverHint'>
+												<div className='hintIcon'>
+													<i className="fa-solid fa-arrow-up-right-from-square"></i>
+												</div>
+											</div>
+										</>}
+									</div>
+								</Spin>
+
 							</>}
 						</div>
 					</div>
-
-					<div className='divider'></div>
-
-					{!userDid && <div className='noDidSection'>
-						<div className='createDidBtn actionBtn' onClick={() => openCreateAccountWindow()}>Create DID and claim!</div>
-					</div>}
-
-					{!!userDid && <div className='claimSection'>
-						<div className='infoText'>{
-							!claimed ? 'Due to your Preference Score you are rewarded:' : 'You have already claimed:'
-						}</div>
-
-						<div className='rewardRow'>
-							<div className='rewardInfo'>
-								<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
-								<span className='rewardAmount'>
-									<span className='rewardNumber'>{rewardAmount ?? '300.00'}</span>
-									<span className='rewardToken'>{ad?.assetName} NFT Power</span>
-								</span>
-							</div>
-						</div>
-
-						{claimed && <>
-							<div className='btnContainer'>
-								<div className='actionBtnBig left' onClick={async () => {
-									window.open(`https://twitter.com/intent/tweet?text=Hundreds of Celebrity NFT Powers awaits you to FREE claim! Install and GemHunt on Twitter HERE ❤️ @ParamiProtocol&url=https://chrome.google.com/webstore/detail/parami-hyperlink-nft-exte/gilmlbeecofjmogfkaocnjmbiblmifad`);
-								}}>Share</div>
-								<div className='actionBtnBig right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Sponsor this influencer</div>
-							</div>
-						</>}
-
-						{!claimed && <>
-							{ad?.instructions?.length > 0 && <>
-								<div className='instructionSection'>
-									<div className='instructionTitle'>Follow the tips below if you are interested</div>
-									{ad.instructions.map((instruction: any, index: number) => {
-										return (
-											<div className='instruction' onClick={() => {
-												!!instruction.link && window.open(`https://weekly.parami.io?redirect=${instruction.link}&nftId=${ad.nftId}&did=${userDid}&ad=${ad.adId}&tag=${instruction.tag}&score=${instruction.score}`);
-												setClaimText('Claim');
-											}} key={index}>
-												<span className='instructionText'>{instruction.text}</span>
-												<span className='instructionTag'>#{instruction.tag}</span>
-												<span className='instructionScore'>+{instruction.score}</span>
-											</div>
-										);
-									})}
-								</div>
-							</>}
-
-							<div className='btnContainer'>
-								<div className='actionBtnBig' onClick={() => openClaimWindow()}>{claimText}</div>
-							</div>
-						</>}
-					</div>}
 				</>}
 			</div>
-
-			{/* todo: add clip path */}
-			{/* <svg height="0" width="0" viewBox='0 0 24 24'>
-				<defs>
-					<clipPath clipPathUnits="objectBoundingBox" id="clipPath" transform="scale(0.005 0.005319148936170213)">
-						<path d="M 22.25 12 c 0 -1.43 -0.88 -2.67 -2.19 -3.34 c 0.46 -1.39 0.2 -2.9 -0.81 -3.91 s -2.52 -1.27 -3.91 -0.81 c -0.66 -1.31 -1.91 -2.19 -3.34 -2.19 s -2.67 0.88 -3.33 2.19 c -1.4 -0.46 -2.91 -0.2 -3.92 0.81 s -1.26 2.52 -0.8 3.91 c -1.31 0.67 -2.2 1.91 -2.2 3.34 s 0.89 2.67 2.2 3.34 c -0.46 1.39 -0.21 2.9 0.8 3.91 s 2.52 1.26 3.91 0.81 c 0.67 1.31 1.91 2.19 3.34 2.19 s 2.68 -0.88 3.34 -2.19 c 1.39 0.45 2.9 0.2 3.91 -0.81 s 1.27 -2.52 0.81 -3.91 c 1.31 -0.67 2.19 -1.91 2.19 -3.34 Z m -11.71 4.2 Z"></path>
-					</clipPath>
-				</defs>
-			</svg> */}
 		</>
 	)
 };

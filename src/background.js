@@ -18,12 +18,28 @@ chrome.storage.sync.set(
   },
 );
 
+const fetchAdPromisesMap = new Map();
+
+const doGraghQuery = async (query) => {
+  const obj = {};
+  obj.operationName = null;
+  obj.variables = {};
+  obj.query = query;
+  return fetch(config.subqueryServer, {
+    "headers": {
+      "content-type": "application/json",
+    },
+    "body": JSON.stringify(obj),
+    "method": "POST"
+  });
+};
+
 (async () => {
   await cryptoWaitReady();
   const provider = new WsProvider(config.socketServer);
   const api = await ApiPromise.create({
     provider,
-    // rpc: config.rpc,
+    rpc: config.rpc,
     runtime: config.runtime
   });
 
@@ -51,10 +67,40 @@ chrome.storage.sync.set(
     const resp = {
       success: true,
       data: {
-        nftId: adInfo.nftId,
+        ...adInfo
       }
     }
     try {
+      const assetInfo = await api.query.assets.metadata(adInfo.nftId);
+      const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
+
+      const query = `
+        query {
+          members(filter: {assetId: {equalTo: "${adInfo.nftId}"}}) {
+            totalCount
+          }
+        }
+      `
+      const holderAccountsRes = await doGraghQuery(query);
+      const holderAccounts = (await holderAccountsRes.json());
+      resp.data.assetName = asset.name;
+      resp.data.numHolders = holderAccounts?.data?.members?.totalCount;
+
+      const header = await api.rpc.chain.getHeader();
+      const blockHash = await api.rpc.chain.getBlockHash(header.number - (24 * 60 * 60) / 12);
+
+      const value = await api.rpc.swap.drylySellTokens(adInfo.nftId, '1'.padEnd(18, '0'));
+      const tokenPrice = value.toHuman();
+
+      let preTokenPrice;
+      try {
+        const preValue = await api.rpc.swap.drylySellTokens(adInfo.nftId, '1'.padEnd(18, '0'), blockHash);
+        preTokenPrice = preValue.toHuman();
+      } catch (_) { }
+
+      resp.data.tokenPrice = tokenPrice;
+      resp.data.preTokenPrice = preTokenPrice;
+
       const slotResp = await api.query.ad.slotOf(adInfo.nftId);
 
       if (slotResp.isEmpty) {
@@ -78,21 +124,17 @@ chrome.storage.sync.set(
       }
 
       const adClaimed = did ? !(await api.query.ad.payout(adId, did)).isEmpty : false;
-      const assetInfo = await api.query.assets.metadata(Number(deleteComma(adInfo.nftId)));
-      const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
-
-      // const value = await api.rpc.swap.drylySellTokens(deleteComma(tokenAssetId), '1'.padEnd(18, '0'));
-      // const tokenPrice = value.toHuman();
 
       return {
         success: true,
         data: {
+          ...adInfo,
           ...adJson,
           adId,
           adClaimed,
-          nftId: adInfo.nftId,
           userDid: did,
           assetName: asset.name,
+          numHolders: holderAccounts?.length
         }
       }
     } catch (e) {
@@ -116,11 +158,18 @@ chrome.storage.sync.set(
     (request, sender, sendResponse) => {
       if (request.method === 'fetchAd') {
         chrome.storage.sync.get(['didHex'], res => {
-          fetchAd(request.adInfo, res?.didHex).then(ad => {
+          const { nftId, contractAddress, tokenId } = request.adInfo;
+          const key = `${nftId}${contractAddress}${tokenId}`;
+
+          if (!fetchAdPromisesMap.has(key)) {
+            fetchAdPromisesMap.set(key, fetchAd(request.adInfo, res?.didHex));
+          }
+
+          fetchAdPromisesMap.get(key).then(ad => {
             sendResponse({
               ad
             });
-          });
+          })
         });
       }
 
@@ -149,8 +198,8 @@ chrome.storage.sync.set(
 // detect tabs change
 chrome.tabs.onUpdated.addListener(
   function (tabId, changeInfo, tab) {
-    console.log('tab change detected', tabId, changeInfo, tab);
     if (changeInfo.url && changeInfo.url.startsWith('https://twitter.com')) {
+      fetchAdPromisesMap.clear();
       chrome.tabs.sendMessage(tabId, {
         method: 'urlChange'
       });

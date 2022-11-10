@@ -2,6 +2,7 @@ export const config = {
   "socketServer": "wss://rpc-global.parami.io/ws",
   "ipfsEndpoint": "https://ipfs.parami.io/ipfs/",
   "paramiWallet": "http://app.parami.io",
+  "airdropServer": "https://airdrop.parami.io",
   "subqueryServer": "https://graph.parami.io",
   rpc: {
     did: {

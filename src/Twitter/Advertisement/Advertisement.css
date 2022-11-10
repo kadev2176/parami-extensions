@@ -86,6 +86,7 @@
   display: flex;
   align-items: center;
 }
+
 .tokenPrice .change .priceChangeText {
   line-height: 19px;
 }
@@ -259,6 +260,25 @@
   opacity: 1;
 }
 
+.mask .confettiContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  z-index: 0;
+  opacity: 0;
+}
+
+.mask.pinned .confettiContainer {
+  opacity: 1;
+}
+
+.mask .infoText,
+.mask .rewardRow,
+.mask .btnContainer {
+  z-index: 1;
+}
+
 .mask .infoText {
   padding: 10px 60px;
 }
@@ -306,6 +326,12 @@
 .rewardInfo .rewardToken {
   font-size: 14px;
   font-weight: 700;
+}
+
+.rewardRow .claimedIcon {
+  font-size: 24px;
+  color: #16C784;
+  display: flex;
 }
 
 .btnContainer {

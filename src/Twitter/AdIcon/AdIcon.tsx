@@ -3,6 +3,7 @@ import './AdIcon.css';
 import { Popover, Card } from 'antd';
 import { useState } from 'react';
 import Advertisement from '../Advertisement/Advertisement';
+import { POST_MESSAGE_PREFIX } from '../../models';
 
 export interface AdIconProps {
     href: string;
@@ -92,10 +93,10 @@ function AdIcon({ href, ad, avatarSrc, largeIcon }: AdIconProps) {
 
     useEffect(() => {
         window.addEventListener('message', (event) => {
-            if (event.origin !== 'https://app.parami.io') {
+            if (event.origin !== 'https://app.parami.io' && event.origin !== 'https://twitter.com') {
                 return;
             }
-            if (event.data && event.data.startsWith('AdClaimed:')) {
+            if (event.data && event.data.startsWith(POST_MESSAGE_PREFIX.AD_CLAIMED)) {
                 const adId = event.data.slice(10);
                 if (adId === adData?.adId) {
                     setAdClaimed(true);

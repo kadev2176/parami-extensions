@@ -1,8 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Advertisement.css';
 import config from '../../config';
-import { formatBalance } from '@polkadot/util';
-import { message, notification, Tooltip } from 'antd';
+import { message, Spin, Tooltip } from 'antd';
+import { POST_MESSAGE_PREFIX } from '../../models';
+import { LoadingOutlined } from '@ant-design/icons';
+import { parseBalance } from '../util';
+import Confetti from '../Confetti/Confetti';
 
 const Advertisement: React.FC<{
 	ad: any;
@@ -15,14 +18,10 @@ const Advertisement: React.FC<{
 }> = ({ ad, avatarSrc, userDid, claimed, clickAction, onClose, showCloseIcon = false }) => {
 	const [rewardAmount, setRewardAmount] = useState<string>('');
 	const [priceInfo, setPriceInfo] = useState<{ price: string, change: number }>();
+	const [claiming, setClaiming] = useState<boolean>(false);
 
 	const tags = (ad?.instructions ?? []).map((instruction: any) => instruction.tag).filter(Boolean);
-
-	const parseBalance = (amount: string) => {
-		const amountWithUnit = formatBalance(amount, { withUnit: false, decimals: 18 });
-		const [price, unit] = amountWithUnit.split(' ');
-		return `${parseFloat(price).toFixed(2)}${unit ? ` ${unit}` : ''}`;
-	}
+	const justClaimed = showCloseIcon && claimed;
 
 	useEffect(() => {
 		if (!ad?.id) {
@@ -46,11 +45,56 @@ const Advertisement: React.FC<{
 	}, [userDid])
 
 	const openClaimWindow = (redirect?: boolean) => {
-		window.open(`${config.paramiWallet}/adClaim/${ad.adId}/${ad.nftId}?redirect=${redirect}`, 'Parami Claim', 'popup,width=400,height=600');
+		window.open(`${config.paramiWallet}/adClaim/${ad.adId}/${ad.nftId}${redirect ? '?redirect=true' : ''}`, 'Parami Claim', 'popup,width=400,height=600');
 	}
 
 	const openCreateAccountWindow = () => {
 		window.open(`${config.paramiWallet}/create/popup`, 'Parami Create DID', 'popup,width=400,height=600');
+	}
+
+	const claim = async (redirect: boolean) => {
+		setClaiming(true);
+		try {
+			const instruction = ad.instructions[0];
+			if (redirect && instruction) {
+				window.open(decodeURIComponent(instruction.link));
+			}
+
+			const body = {
+				adId: ad.adId,
+				nftId: ad.nftId,
+				did: userDid,
+				score: {
+					tag: instruction?.tag,
+					score: redirect ? instruction?.score : -5
+				}
+			};
+
+			const res = await fetch(`https://weekly.parami.io/api/pay`, {
+				"headers": {
+					"content-type": "application/json",
+				},
+				"body": JSON.stringify(body),
+				"method": "POST",
+			});
+
+			setClaiming(false);
+
+			if (res.ok) {
+				window.postMessage(`${POST_MESSAGE_PREFIX.AD_CLAIMED}:${ad.adId}`, '*');
+			} else {
+				message.error({
+					content: 'Network Error. Please try again later.'
+				})
+			}
+		} catch (e) {
+			console.log('HNFT extension claiming error', e);
+			setClaiming(false);
+			message.error({
+				content: 'Network Error. Please try again later.'
+			})
+		}
+
 	}
 
 	const sponsorName = ad?.sponsorName ?? 'Parami';
@@ -170,79 +214,94 @@ const Advertisement: React.FC<{
 								</span>}
 							</div>
 							{ad?.media && <>
-								<div className='posterSection'>
-									<img
-										src={ad?.media}
-										referrerPolicy='no-referrer'
-										className='adMediaImg'
-									/>
+								<Spin spinning={claiming} indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} tip="Claiming...">
+									<div className='posterSection'>
+										<img
+											src={ad?.media}
+											referrerPolicy='no-referrer'
+											className='adMediaImg'
+										/>
 
-									<div className={`mask ${(showCloseIcon && claimed) ? 'pinned' : ''}`}>
-										<div className='infoText'>
-											{!claimed ? 'You will be rewarded' : 'You have claimed'}
-											<Tooltip title="Rewards are calculated based on your DID preference score">
-												<span className='rewardInfoMark'><i className="fa-solid fa-circle-exclamation"></i></span>
-											</Tooltip>
-										</div>
-
-										<div className='rewardRow'>
-											<div className={`rewardInfo ${claimed ? 'gotoWallet' : ''}`} onClick={() => {
-												if (claimed) {
-													window.open(config.paramiWallet);
-												}
-											}}>
-												<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
-												<span className='rewardAmount'>
-													<span className='rewardNumber'>{rewardAmount ?? '300.00'}</span>
-													<span className='rewardToken'>{ad?.assetName} NFT Power</span>
-												</span>
+										<div className={`mask ${justClaimed ? 'pinned' : ''}`}>
+											<div className={`confettiContainer`}>
+												<Confetti />
 											</div>
-										</div>
 
-										<div className='btnContainer'>
-											{!userDid && <>
-												<div className='actionBtn' onClick={() => openCreateAccountWindow()}>Create DID and claim!</div>
-											</>}
+											<div className='infoText'>
+												{!claimed ? 'You will be rewarded' : 'You have claimed'}
+												<Tooltip title="Rewards are calculated based on your DID preference score">
+													<span className='rewardInfoMark'><i className="fa-solid fa-circle-exclamation"></i></span>
+												</Tooltip>
+											</div>
 
-											{!!userDid && <>
+											<div className='rewardRow'>
+												<div className={`rewardInfo ${claimed ? 'gotoWallet' : ''}`} onClick={() => {
+													if (claimed) {
+														window.open(config.paramiWallet);
+													}
+												}}>
+													<img referrerPolicy='no-referrer' className='kolIcon' src={avatarSrc}></img>
+													<span className='rewardAmount'>
+														<span className='rewardNumber'>{rewardAmount ?? '300.00'}</span>
+														<span className='rewardToken'>{ad?.assetName} NFT Power</span>
+													</span>
+												</div>
+
 												{claimed && <>
-													<div className='actionBtn left' onClick={async () => {
-														await navigator.clipboard.writeText(`${config.paramiWallet}/ad/?nftId=${ad.nftId}&referrer=${userDid}`);
-														message.success({
-															content: 'Referral link copied!',
-															style: {
-																marginTop: '20vh',
-																zIndex: 1050
-															},
-														});
-													}}>Share</div>
-													<div className='actionBtn right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Buy more</div>
+													<div className='claimedIcon'>
+														<i className="fa-solid fa-circle-check"></i>
+													</div>
+												</>}
+											</div>
+
+											<div className='btnContainer'>
+												{!userDid && <>
+													<div className='actionBtn' onClick={() => openCreateAccountWindow()}>Create DID and claim!</div>
 												</>}
 
-												{!claimed && <>
-													<>
-														<div className='actionBtn left' onClick={() => {
-															clickAction();
-															openClaimWindow();
-														}}>Claim</div>
-														<div className='actionBtn right' onClick={() => {
-															clickAction();
-															openClaimWindow(true);
-														}}>Claim & Learn more</div>
-													</>
-												</>}
-											</>}
-										</div>
-									</div>
+												{!!userDid && <>
+													{claimed && <>
+														<div className='actionBtn left' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Buy more</div>
+														<div className='actionBtn right' onClick={async () => {
+															await navigator.clipboard.writeText(`${config.paramiWallet}/ad/?nftId=${ad.nftId}&referrer=${userDid}`);
+															message.success({
+																content: 'Referral link copied!',
+																style: {
+																	marginTop: '20vh',
+																	zIndex: 1050
+																},
+															});
+														}}>Share & Earn more</div>
+													</>}
 
-									{!(showCloseIcon && claimed) && <>
-										<div className='hoverHint'>
-											<div className='hintIcon'>
-												<i className="fa-solid fa-arrow-up-right-from-square"></i>
+													{!claimed && <>
+														<>
+															<div className='actionBtn left' onClick={() => {
+																clickAction();
+																claim(false);
+															}}>Claim</div>
+															<div className='actionBtn right' onClick={() => {
+																clickAction();
+																claim(true);
+															}}>Claim & Learn more</div>
+														</>
+													</>}
+												</>}
 											</div>
 										</div>
-									</>}
-								</div>
+
+
+
+										{!(showCloseIcon && claimed) && <>
+											<div className='hoverHint'>
+												<div className='hintIcon'>
+													<i className="fa-solid fa-arrow-up-right-from-square"></i>
+												</div>
+											</div>
+										</>}
+									</div>
+								</Spin>
+
 							</>}
 						</div>
 					</div>

@@ -43,3 +43,7 @@ export const NOT_PARAMI_AD = {
     success: true,
     data: null
 }
+
+export const POST_MESSAGE_PREFIX = {
+    AD_CLAIMED: 'AdClaimed'
+}

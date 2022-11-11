@@ -139,6 +139,7 @@
 
 .sponsorText {
   flex-grow: 1;
+  opacity: 0.8;
 }
 
 .sponsorText .sponsorName {
@@ -229,12 +230,14 @@
 
 .descriptionText {
   margin-right: 4px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .adDescription .tags .tag {
   display: inline-block;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   margin-right: 5px;
 }
 
@@ -296,11 +299,15 @@
   align-items: center;
 }
 
-.rewardInfo.gotoWallet {
+.rewardRow.claimed {
+  animation: breathing 3s ease-out infinite normal;
+}
+
+.rewardRow.claimed .rewardInfo {
   cursor: pointer;
 }
 
-.rewardInfo.gotoWallet:hover .rewardAmount {
+.rewardRow.claimed .rewardInfo:hover .rewardAmount {
   text-decoration: underline;
 }
 
@@ -387,4 +394,30 @@
 
 .posterSection:hover .hoverHint {
   display: none;
+}
+
+@keyframes breathing {
+  0% {
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+  }
+
+  25% {
+    -webkit-transform: scale(1.05);
+    -ms-transform: scale(1.05);
+    transform: scale(1.05);
+  }
+
+  60% {
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+  }
+
+  100% {
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+  }
 }

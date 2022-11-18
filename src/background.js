@@ -183,6 +183,7 @@ const doGraghQuery = async (query) => {
 
       if (request.method === 'openTwitterTab') {
         twitterTabId = sender.tab.id;
+        fetchAdPromisesMap.clear();
       }
 
       if (request.method === 'didChange' && twitterTabId) {

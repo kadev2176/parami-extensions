@@ -110,7 +110,6 @@ import 'antd/dist/antd.css';
     function (request, sender, sendResponse) {
       // listen for messages sent from background.js
       if (request.method === 'urlChange') {
-        console.log('Got url change. Clear cache.');
         // clear cache
         nodeMap.clear();
         imgUrl2AdInfoPromise.clear();

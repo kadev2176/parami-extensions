@@ -96,10 +96,12 @@ function AdIcon({ href, ad, avatarSrc, largeIcon }: AdIconProps) {
             if (event.origin !== 'https://app.parami.io' && event.origin !== 'https://twitter.com') {
                 return;
             }
-            if (event.data && event.data.startsWith(POST_MESSAGE_PREFIX.AD_CLAIMED)) {
-                const adId = event.data.slice(10);
-                if (adId === adData?.adId) {
-                    setAdClaimed(true);
+            if (event.data) {
+                if (typeof event.data.startsWith === 'function' && event.data.startsWith(POST_MESSAGE_PREFIX.AD_CLAIMED)) {
+                    const adId = event.data.slice(10);
+                    if (adId === adData?.adId) {
+                        setAdClaimed(true);
+                    }
                 }
             }
         });

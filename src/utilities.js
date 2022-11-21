@@ -1,9 +1,7 @@
 /* eslint no-bitwise: ["error", { "allow": ["<<=", "|="] }] */
 "use strict";
 
-import { ethers } from 'ethers';
-import hcontract from './ERC721HCollection.json';
-import { MULTI_JUMP_LIMIT, PREFIX_CONTRACT, PREFIX_DID, PREFIX_HTTP, PREFIX_HTTPS, PREFIX_IPFS, PREFIX_IPFS_URL, PREFIX_WNFT, TYPE_ID_2_STRING, NFT_RECOGNITION_ENDPOINT } from './models';
+import { MULTI_JUMP_LIMIT, PREFIX_CONTRACT, PREFIX_DID, PREFIX_HTTP, PREFIX_HTTPS, PREFIX_IPFS, PREFIX_IPFS_URL, PREFIX_WNFT, TYPE_ID_2_STRING, PARAMI_AIRDROP_ENDPOINT } from './models';
 import bs58 from 'bs58';
 
 /* eslint-disable no-bitwise */
@@ -348,20 +346,12 @@ export const parseMetaLink = async (metaLink, jumps) => {
             const params = new URLSearchParams(parts[1]);
             const tokenId = parseInt(params.get('tokenId'), 10);
 
-            const paramiServer = await getParamiServer();
-            const hContract = new ethers.Contract(
-                contractAddress,
-                hcontract.abi,
-                ethers.getDefaultProvider(paramiServer.chainId)
-            );
-
-            // get new meta link
-            try {
-                const newLink = (await hContract.getSlotUri(tokenId, paramiServer.paramiLinkAddress)).toString();
-                return parseMetaLink(newLink || 'https://app.parami.io', jumps + 1);
-            } catch (e) {
-                console.error('[Hyperlink NFT Extension] Get link error', e);
-                return 'https://app.parami.io';
+            const slotUriResp = await fetch(`${PARAMI_AIRDROP_ENDPOINT}/api/hnft/slotUri/${contractAddress}/${tokenId}`);
+            if (slotUriResp.ok) {
+                const slotUri = await slotUriResp.json();
+                return slotUri;
+            } else {
+                return '';
             }
         } else if (metaLink.startsWith(PREFIX_DID)) {
             const didHex = metaLink.slice(6);
@@ -420,7 +410,7 @@ export const queryAdInfoFromAvatar = async (avatarImageSrc, targetUsername, from
     let hnft, contractAddress, tokenId;
 
     // fetch hnft info by recognition
-    const fetchNftResp = await fetch(`${NFT_RECOGNITION_ENDPOINT}?imageUrl=${avatarImageSrc}&targetUser=${targetUsername !== 'photo' ? targetUsername : ''}&fromUser=${fromUser}`);
+    const fetchNftResp = await fetch(`${PARAMI_AIRDROP_ENDPOINT}/nft-recognition/nfts?imageUrl=${avatarImageSrc}&targetUser=${targetUsername !== 'photo' ? targetUsername : ''}&fromUser=${fromUser}`);
     if (fetchNftResp.ok) {
         const { contractAddress, tokenId } = await fetchNftResp.json();
         hnft = `${PREFIX_WNFT}${contractAddress}?tokenId=${tokenId}`;

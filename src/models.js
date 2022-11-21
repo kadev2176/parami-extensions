@@ -18,7 +18,7 @@ export const AD_ICON_CONTAINER_CLASSNAME = 'ad-icon-container';
 
 export const MULTI_JUMP_LIMIT = 5;
 
-export const NFT_RECOGNITION_ENDPOINT = 'https://airdrop.parami.io/nft-recognition/nfts';
+export const PARAMI_AIRDROP_ENDPOINT = 'https://airdrop.parami.io';
 
 export const TYPE_ID_2_STRING = {
     '1': 'wnft',

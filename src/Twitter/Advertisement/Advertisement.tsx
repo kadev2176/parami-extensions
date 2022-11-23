@@ -234,7 +234,7 @@ const Advertisement: React.FC<{
 												</Tooltip>
 											</div>
 
-											<div className='rewardRow'>
+											<div className={`rewardRow ${claimed ? 'claimed' : ''}`}>
 												<div className={`rewardInfo ${claimed ? 'gotoWallet' : ''}`} onClick={() => {
 													if (claimed) {
 														window.open(config.paramiWallet);

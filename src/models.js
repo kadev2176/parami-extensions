@@ -47,3 +47,8 @@ export const NOT_PARAMI_AD = {
 export const POST_MESSAGE_PREFIX = {
     AD_CLAIMED: 'AdClaimed'
 }
+
+export const AD_DATA_TYPE = {
+    AD: 'ad',
+    CLOCK_IN: 'clockIn'
+}

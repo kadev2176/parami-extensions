@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './Advertisement.css';
 import config from '../../config';
 import { message, Spin, Tooltip } from 'antd';
-import { POST_MESSAGE_PREFIX } from '../../models';
+import { AD_DATA_TYPE, POST_MESSAGE_PREFIX } from '../../models';
 import { LoadingOutlined } from '@ant-design/icons';
 import { parseBalance } from '../util';
 import Confetti from '../Confetti/Confetti';
@@ -16,11 +16,9 @@ const Advertisement: React.FC<{
 	onClose: () => void;
 	showCloseIcon: boolean;
 }> = ({ ad, avatarSrc, userDid, claimed, clickAction, onClose, showCloseIcon = false }) => {
-	const [rewardAmount, setRewardAmount] = useState<string>('');
+	const [rewardAmount, setRewardAmount] = useState<string>(ad.rewardAmount ? parseBalance(ad.rewardAmount) : '');
 	const [priceInfo, setPriceInfo] = useState<{ price: string, change: number }>();
 	const [claiming, setClaiming] = useState<boolean>(false);
-
-	const tags = (ad?.instructions ?? []).map((instruction: any) => instruction.tag).filter(Boolean);
 	const justClaimed = showCloseIcon && claimed;
 
 	useEffect(() => {
@@ -38,14 +36,23 @@ const Advertisement: React.FC<{
 	}, [ad])
 
 	useEffect(() => {
-		chrome.runtime.sendMessage({ method: 'calReward', adId: ad.adId, nftId: ad.nftId, did: userDid }, (response) => {
-			const { rewardAmount } = response ?? {};
-			setRewardAmount(parseBalance(rewardAmount));
-		});
-	}, [userDid])
+		if (userDid && !rewardAmount) {
+			chrome.runtime.sendMessage({ method: 'calReward', adId: ad.adId, nftId: ad.nftId, did: userDid }, (response) => {
+				const { rewardAmount } = response ?? {};
+				setRewardAmount(parseBalance(rewardAmount));
+			});
+		}
+	}, [userDid, rewardAmount]);
 
-	const openClaimWindow = (redirect?: boolean) => {
-		window.open(`${config.paramiWallet}/adClaim/${ad.adId}/${ad.nftId}${redirect ? '?redirect=true' : ''}`, 'Parami Claim', 'popup,width=400,height=600');
+	useEffect(() => {
+		if (claimed) {
+			setClaiming(false);
+		}
+	}, [claimed])
+
+	const openClaimWindow = () => {
+		// window.open(`${config.paramiWallet}/clockInClaim/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
+		window.open(`http://local.parami.io:1024/clockInClaim/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
 	}
 
 	const openCreateAccountWindow = () => {
@@ -55,9 +62,13 @@ const Advertisement: React.FC<{
 	const claim = async (redirect: boolean) => {
 		setClaiming(true);
 		try {
-			const instruction = ad.instructions[0];
-			if (redirect && instruction) {
-				window.open(decodeURIComponent(instruction.link));
+			if (ad.type === AD_DATA_TYPE.CLOCK_IN) {
+				openClaimWindow();
+				return;
+			}
+			
+			if (redirect && ad.link) {
+				window.open(decodeURIComponent(ad.link));
 			}
 
 			const body = {
@@ -65,8 +76,8 @@ const Advertisement: React.FC<{
 				nftId: ad.nftId,
 				did: userDid,
 				score: {
-					tag: instruction?.tag,
-					score: redirect ? instruction?.score : -5
+					tag: ad.tag,
+					score: redirect ? ad.score : -5
 				}
 			};
 
@@ -122,7 +133,7 @@ const Advertisement: React.FC<{
 	return (
 		<>
 			<div className='advertisementContainer'>
-				{!ad?.adId && <>
+				{!ad?.type && <>
 					{claimInfoMark}
 					<div className='bidSection'>
 						<div className='daoInfo'>
@@ -182,24 +193,29 @@ const Advertisement: React.FC<{
 					</div>
 				</>}
 
-				{!!ad?.adId && <>
+				{!!ad?.type && <>
 					{claimInfoMark}
 					<div className='sponsorInfo'>
 						{ad?.icon && <img referrerPolicy='no-referrer' className='sponsorIcon' src={ad?.icon}></img>}
 						<span className='sponsorText'>
-							{!!abbreviation && <>
-								<Tooltip title={sponsorName}>
+							{ad.type === AD_DATA_TYPE.AD && <>
+								{!!abbreviation && <>
+									<Tooltip title={sponsorName}>
+										<span className='sponsorName'>
+											{abbreviation}
+										</span>
+									</Tooltip>
+								</>}
+								{!abbreviation && <>
 									<span className='sponsorName'>
-										{abbreviation}
+										{sponsorName}
 									</span>
-								</Tooltip>
+								</>}
+								<span>is sponsoring this {hNFT}. </span>
 							</>}
-							{!abbreviation && <>
-								<span className='sponsorName'>
-									{sponsorName}
-								</span>
+							{ad.type === AD_DATA_TYPE.CLOCK_IN && <>
+								<span>{ad?.assetName} NFT Power </span>
 							</>}
-							<span>is sponsoring this {hNFT}. </span>
 							<a className='bidLink' href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">Bid on this ad space</a>
 						</span>
 					</div>
@@ -208,16 +224,18 @@ const Advertisement: React.FC<{
 						<div className='adSectionArrow back'></div>
 						<div className='adContent'>
 							<div className='adDescription'>
-								<span className='descriptionText'>{ad?.content ?? ad?.description ?? 'View Ads. Get Paid.'}</span>
-								{tags?.length > 0 && <span className='tags'>
-									{tags.map((tag: string, index: number) => <span className='tag' key={index}>#{tag}</span>)}
-								</span>}
+								<span className='descriptionText'>{ad?.content ?? 'View Ads. Get Paid.'}</span>
+								{!!ad.tag && <>
+									<span className='tags'>
+										<span className='tag'>#{ad.tag}</span>
+									</span>
+								</>}
 							</div>
-							{ad?.media && <>
+							{ad?.poster && <>
 								<Spin spinning={claiming} indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} tip="Claiming...">
 									<div className='posterSection'>
 										<img
-											src={ad?.media}
+											src={ad?.poster}
 											referrerPolicy='no-referrer'
 											className='adMediaImg'
 										/>
@@ -271,26 +289,35 @@ const Advertisement: React.FC<{
 																	zIndex: 1050
 																},
 															});
-														}}>Share & Earn more</div>
+														}}>
+															{ad.type === AD_DATA_TYPE.CLOCK_IN && 'Share'}
+															{ad.type === AD_DATA_TYPE.AD && 'Share & Earn more'}
+														</div>
 													</>}
 
 													{!claimed && <>
 														<>
-															<div className='actionBtn left' onClick={() => {
-																clickAction();
-																claim(false);
-															}}>Claim</div>
-															<div className='actionBtn right' onClick={() => {
-																clickAction();
-																claim(true);
-															}}>Claim & Learn more</div>
+															{ad.type === AD_DATA_TYPE.CLOCK_IN && <>
+																<div className='actionBtn left right' onClick={() => {
+																	clickAction();
+																	claim(false);
+																}}>Claim</div>
+															</>}
+															{ad.type === AD_DATA_TYPE.AD && <>
+																<div className='actionBtn left' onClick={() => {
+																	clickAction();
+																	claim(false);
+																}}>Claim</div>
+																<div className='actionBtn right' onClick={() => {
+																	clickAction();
+																	claim(true);
+																}}>Claim & Learn more</div>
+															</>}
 														</>
 													</>}
 												</>}
 											</div>
 										</div>
-
-
 
 										{!(showCloseIcon && claimed) && <>
 											<div className='hoverHint'>
@@ -301,7 +328,6 @@ const Advertisement: React.FC<{
 										</>}
 									</div>
 								</Spin>
-
 							</>}
 						</div>
 					</div>

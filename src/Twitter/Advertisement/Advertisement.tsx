@@ -51,8 +51,7 @@ const Advertisement: React.FC<{
 	}, [claimed])
 
 	const openClaimWindow = () => {
-		// window.open(`${config.paramiWallet}/clockInClaim/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
-		window.open(`http://local.parami.io:1024/clockInClaim/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
+		window.open(`${config.paramiWallet}/clockInClaim/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
 	}
 
 	const openCreateAccountWindow = () => {
@@ -92,7 +91,7 @@ const Advertisement: React.FC<{
 			setClaiming(false);
 
 			if (res.ok) {
-				window.postMessage(`${POST_MESSAGE_PREFIX.AD_CLAIMED}:${ad.adId}`, '*');
+				window.postMessage(`${POST_MESSAGE_PREFIX.AD_CLAIMED}:${ad.nftId}`, '*');
 			} else {
 				message.error({
 					content: 'Network Error. Please try again later.'

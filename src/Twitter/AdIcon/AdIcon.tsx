@@ -98,8 +98,8 @@ function AdIcon({ href, ad, avatarSrc, largeIcon }: AdIconProps) {
             }
             if (event.data) {
                 if (typeof event.data.startsWith === 'function' && event.data.startsWith(POST_MESSAGE_PREFIX.AD_CLAIMED)) {
-                    const adId = event.data.slice(10);
-                    if (adId === adData?.adId) {
+                    const nftId = event.data.slice(10);
+                    if (nftId === adData?.nftId) {
                         setAdClaimed(true);
                     }
                 }
@@ -123,11 +123,11 @@ function AdIcon({ href, ad, avatarSrc, largeIcon }: AdIconProps) {
 
         {content && <>
             <Popover content={content} placement="rightTop" className='ad-popover' trigger={trigger} onOpenChange={handlePopoverOpen} open={open}>
-                <span className={`pfp-link-badge ${adData?.adId ? 'ad-icon' : 'default-icon'} ${largeIcon ? 'large-icon' : ''}`}>
-                    {adData?.adId && <span className='img-container'>
+                <span className={`pfp-link-badge ${!!adData?.type ? 'ad-icon' : 'default-icon'} ${largeIcon ? 'large-icon' : ''}`}>
+                    {!!adData?.type && <span className='img-container'>
                         <img referrerPolicy='no-referrer' src={adData?.icon ?? defaultAdIcon}></img>
                     </span>}
-                    {!adData?.adId && <>
+                    {!adData?.type && <>
                         <i className="fa-solid fa-heart"></i>
                     </>}
                 </span>

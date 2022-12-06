@@ -257,7 +257,26 @@ export const config = {
         },
         version: 1
       }
-    ]
+    ],
+    ClockInRuntimeApi: [{
+      methods: {
+        get_clock_in_info: {
+          description: "(enabled, claimable, token)",
+          params: [
+            {
+              "name": "nft_id",
+              "type": "u32"
+            },
+            {
+              "name": "did",
+              "type": "H160"
+            }
+          ],
+          type: "(u8, bool, bool, u128)"
+        }
+      },
+      version: 1
+    }]
   }
 };
 export default config;

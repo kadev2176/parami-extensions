@@ -5,10 +5,9 @@
 // For more information on background script,
 // See https://developer.chrome.com/extensions/background_pages
 
-import { NETWORK_MAINNET, NETWORK_TEST, NOT_PARAMI_AD } from './models';
+import { NETWORK_MAINNET, NOT_PARAMI_AD, AD_DATA_TYPE } from './models';
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
-// import { formatBalance } from '@polkadot/util';
 import { config } from './config';
 import { deleteComma } from './utilities';
 
@@ -33,6 +32,16 @@ const doGraghQuery = async (query) => {
     "method": "POST"
   });
 };
+
+const fetchMetadata = async (ipfsUrl) => {
+  if (!ipfsUrl || !ipfsUrl.startsWith('ipfs://')) {
+    return {}
+  }
+
+  const hash = ipfsUrl.substring(7);
+  const adJsonResp = await fetch(config.ipfsEndpoint + hash);
+  return await adJsonResp.json();
+}
 
 (async () => {
   await cryptoWaitReady();
@@ -64,12 +73,13 @@ const doGraghQuery = async (query) => {
       return NOT_PARAMI_AD;
     }
 
-    const resp = {
-      success: true,
-      data: {
-        ...adInfo
-      }
-    }
+    let ad = { 
+      nftId: adInfo.nftId,
+      contractAddress: adInfo.contractAddress,
+      tokenId: adInfo.tokenId,
+      userDid: did
+    };
+
     try {
       const assetInfo = await api.query.assets.metadata(adInfo.nftId);
       const asset = assetInfo.isEmpty ? {} : assetInfo.toHuman();
@@ -83,8 +93,9 @@ const doGraghQuery = async (query) => {
       `
       const holderAccountsRes = await doGraghQuery(query);
       const holderAccounts = (await holderAccountsRes.json());
-      resp.data.assetName = asset.name;
-      resp.data.numHolders = holderAccounts?.data?.members?.totalCount;
+
+      ad.assetName = asset.name;
+      ad.numHolders = holderAccounts?.data?.members?.totalCount;
 
       const header = await api.rpc.chain.getHeader();
       const blockHash = await api.rpc.chain.getBlockHash(header.number - (24 * 60 * 60) / 12);
@@ -98,51 +109,78 @@ const doGraghQuery = async (query) => {
         preTokenPrice = preValue.toHuman();
       } catch (_) { }
 
-      resp.data.tokenPrice = tokenPrice;
-      resp.data.preTokenPrice = preTokenPrice;
+      ad.tokenPrice = tokenPrice;
+      ad.preTokenPrice = preTokenPrice;
 
       const slotResp = await api.query.ad.slotOf(adInfo.nftId);
 
-      if (slotResp.isEmpty) {
-        return resp;
+      if (!slotResp.isEmpty) {
+        ad.type = AD_DATA_TYPE.AD;
+        const { adId } = slotResp.toHuman();
+        const adResp = await api.query.ad.metadata(adId);
+        const adMetadata = adResp.toHuman();
+        const adJson = await fetchMetadata(adMetadata?.metadata);
+        const adClaimed = did && !(await api.query.ad.payout(adId, did)).isEmpty;
+
+        const instruction = adJson.instructions && adJson.instructions[0];
+
+        ad.adId = adId;
+        ad.content = adJson.description ?? adJson.content;
+        ad.sponsorName = adJson.sponsorName;
+        ad.icon = adJson.icon;
+        ad.poster = adJson.media ?? adJson.poster;
+        ad.tag = instruction?.tag;
+        ad.link = instruction?.link;
+        ad.score = instruction?.score;
+        ad.adClaimed = adClaimed;
+
+        return {
+          success: true,
+          data: ad
+        }
       }
 
-      const { adId } = slotResp.toHuman();
-      const adResp = await api.query.ad.metadata(adId);
+      const clockInRes = await api.call.clockInRuntimeApi.getClockInInfo(adInfo.nftId, did);
+      const [_, enabled, claimable, amount] = clockInRes.toHuman();
 
-      if (adResp.isEmpty) {
-        return resp;
-      };
-
-      const ad = adResp.toHuman();
-
-      let adJson = {};
-      if (ad?.metadata?.startsWith('ipfs://')) {
-        const hash = ad?.metadata?.substring(7);
-        const adJsonResp = await fetch(config.ipfsEndpoint + hash);
-        adJson = await adJsonResp.json();
+      if (!enabled) {
+        return {
+          success: true,
+          data: ad
+        };
       }
 
-      const adClaimed = did ? !(await api.query.ad.payout(adId, did)).isEmpty : false;
+      const clockInMetadataRes = await api.query.clockIn.metadata(adInfo.nftId);
+
+      if (clockInMetadataRes.isEmpty) {
+        return {
+          success: true,
+          data: ad
+        };
+      }
+
+      let clockInMetadata = clockInMetadataRes.toHuman();
+
+      ad.type = AD_DATA_TYPE.CLOCK_IN;
+      const clockInContent = await fetchMetadata(clockInMetadata.metadata);
+
+      ad.content = clockInContent.content;
+      ad.icon = clockInContent.icon;
+      ad.poster = clockInContent.poster;
+
+      ad.adClaimed = !claimable;
+      ad.rewardAmount = deleteComma(amount);
 
       return {
         success: true,
-        data: {
-          ...adInfo,
-          ...adJson,
-          adId,
-          adClaimed,
-          userDid: did,
-          assetName: asset.name,
-          numHolders: holderAccounts?.length
-        }
-      }
+        data: ad
+      };
     } catch (e) {
       console.log(e);
       return {
         success: false,
         data: null,
-        adInfo
+        adInfo: ad
       };
     }
   }

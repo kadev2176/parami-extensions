@@ -150,9 +150,12 @@ const fetchMetadata = async (ipfsUrl) => {
         };
       }
 
+      const lotteryRes = await api.query.clockIn.lotteryMetadataStore(adInfo.nftId);
+      const { awardPerShare } = lotteryRes.toHuman();
+
       ad.type = AD_DATA_TYPE.LOTTERY;
       ad.adClaimed = !claimable;
-      ad.rewardAmount = deleteComma(amount); // todo: check amount
+      ad.rewardAmount = deleteComma(awardPerShare);
 
       return {
         success: true,

@@ -50,5 +50,5 @@ export const POST_MESSAGE_PREFIX = {
 
 export const AD_DATA_TYPE = {
     AD: 'ad',
-    CLOCK_IN: 'clockIn'
+    LOTTERY: 'lottery'
 }

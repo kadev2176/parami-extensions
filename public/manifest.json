@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Hyperlink NFT Extension",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "Enable Hyperlink for your HNFT profile photo.",
   "icons": {
     "16": "icons/icon_16.png",

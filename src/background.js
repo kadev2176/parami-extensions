@@ -73,7 +73,7 @@ const fetchMetadata = async (ipfsUrl) => {
       return NOT_PARAMI_AD;
     }
 
-    let ad = { 
+    let ad = {
       nftId: adInfo.nftId,
       contractAddress: adInfo.contractAddress,
       tokenId: adInfo.tokenId,
@@ -150,26 +150,12 @@ const fetchMetadata = async (ipfsUrl) => {
         };
       }
 
-      const clockInMetadataRes = await api.query.clockIn.metadata(adInfo.nftId);
+      const lotteryRes = await api.query.clockIn.lotteryMetadataStore(adInfo.nftId);
+      const { awardPerShare } = lotteryRes.toHuman();
 
-      if (clockInMetadataRes.isEmpty) {
-        return {
-          success: true,
-          data: ad
-        };
-      }
-
-      let clockInMetadata = clockInMetadataRes.toHuman();
-
-      ad.type = AD_DATA_TYPE.CLOCK_IN;
-      const clockInContent = await fetchMetadata(clockInMetadata.metadata);
-
-      ad.content = clockInContent.content;
-      ad.icon = clockInContent.icon;
-      ad.poster = clockInContent.poster;
-
+      ad.type = AD_DATA_TYPE.LOTTERY;
       ad.adClaimed = !claimable;
-      ad.rewardAmount = deleteComma(amount);
+      ad.rewardAmount = deleteComma(awardPerShare);
 
       return {
         success: true,

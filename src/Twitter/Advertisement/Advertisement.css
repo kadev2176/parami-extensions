@@ -91,6 +91,32 @@
   line-height: 19px;
 }
 
+.lotteryInfo {
+  text-align: center;
+  padding: 10px;
+  padding-bottom: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lotteryBtnContainer .actionBtn {
+  background: #000000;
+  color: #ffffff;
+  text-align: center;
+  min-width: 120px;
+}
+
+.lotteryBtnContainer {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
+.lotteryBtnContainer .actionBtn:hover {
+  background: #3c3c3c;
+}
+
 .bidSectionInfo {
   text-align: center;
   padding: 10px;

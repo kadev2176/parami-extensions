@@ -51,8 +51,7 @@ const Advertisement: React.FC<{
 	}, [claimed])
 
 	const openClaimWindow = () => {
-		// window.open(`${config.paramiWallet}/clockInClaim/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
-		window.open(`http://local.parami.io:1024/clockInClaim/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
+		window.open(`${config.paramiWallet}/clockInClaim/${ad.nftId}`, 'Parami Claim', 'popup,width=400,height=600');
 	}
 
 	const openCreateAccountWindow = () => {
@@ -62,11 +61,7 @@ const Advertisement: React.FC<{
 	const claim = async (redirect: boolean) => {
 		setClaiming(true);
 		try {
-			if (ad.type === AD_DATA_TYPE.CLOCK_IN) {
-				openClaimWindow();
-				return;
-			}
-			
+
 			if (redirect && ad.link) {
 				window.open(decodeURIComponent(ad.link));
 			}
@@ -92,7 +87,7 @@ const Advertisement: React.FC<{
 			setClaiming(false);
 
 			if (res.ok) {
-				window.postMessage(`${POST_MESSAGE_PREFIX.AD_CLAIMED}:${ad.adId}`, '*');
+				window.postMessage(`${POST_MESSAGE_PREFIX.AD_CLAIMED}:${ad.nftId}`, '*');
 			} else {
 				message.error({
 					content: 'Network Error. Please try again later.'
@@ -133,7 +128,7 @@ const Advertisement: React.FC<{
 	return (
 		<>
 			<div className='advertisementContainer'>
-				{!ad?.type && <>
+				{ad?.type !== AD_DATA_TYPE.AD && <>
 					{claimInfoMark}
 					<div className='bidSection'>
 						<div className='daoInfo'>
@@ -181,41 +176,63 @@ const Advertisement: React.FC<{
 									</>}
 								</div>
 							</>}
+						</div>
 
-						</div>
-						<div className='bidSectionInfo'>{`${ad?.assetName} `}{hNFT}{` is available to be hyperlinked...`}</div>
-						<div className='bidSectionBtnContainer'>
-							<div className='actionBtn left' onClick={async () => {
-								window.open(`${config.paramiWallet}/bid/${ad.nftId}`);
-							}}>Place an Ad</div>
-							<div className='actionBtn right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Buy more</div>
-						</div>
+						{ad?.type === AD_DATA_TYPE.LOTTERY && <>
+							<div className='lotteryInfo'>
+								You have a chance to win {rewardAmount} {ad?.assetName} NFT Power!
+							</div>
+							{!claimed && <>
+								<div className='lotteryBtnContainer'>
+									<div className='actionBtn' onClick={() => {
+										window.open(`${config.paramiWallet}/lottery/?nftId=${ad.nftId}`);
+									}}>
+										Check it out
+									</div>
+								</div>
+							</>}
+							{claimed && <>
+								<div className='bidSectionInfo'>You have already participated. Try again tomorrow!</div>
+								<div className='bidSectionBtnContainer'>
+									<div className='actionBtn left' onClick={async () => {
+										window.open(`${config.paramiWallet}/bid/${ad.nftId}`);
+									}}>Place an Ad</div>
+									<div className='actionBtn right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Buy more</div>
+								</div>
+							</>}
+						</>}
+
+						{!ad?.type && <>
+							<div className='bidSectionInfo'>{`${ad?.assetName} `}{hNFT}{` is available to be hyperlinked...`}</div>
+							<div className='bidSectionBtnContainer'>
+								<div className='actionBtn left' onClick={async () => {
+									window.open(`${config.paramiWallet}/bid/${ad.nftId}`);
+								}}>Place an Ad</div>
+								<div className='actionBtn right' onClick={() => window.open(`${config.paramiWallet}/swap/${ad.nftId}`)}>Buy more</div>
+							</div>
+						</>}
 					</div>
 				</>}
 
-				{!!ad?.type && <>
+				{ad?.type === AD_DATA_TYPE.AD && <>
 					{claimInfoMark}
 					<div className='sponsorInfo'>
 						{ad?.icon && <img referrerPolicy='no-referrer' className='sponsorIcon' src={ad?.icon}></img>}
 						<span className='sponsorText'>
-							{ad.type === AD_DATA_TYPE.AD && <>
-								{!!abbreviation && <>
-									<Tooltip title={sponsorName}>
-										<span className='sponsorName'>
-											{abbreviation}
-										</span>
-									</Tooltip>
-								</>}
-								{!abbreviation && <>
+
+							{!!abbreviation && <>
+								<Tooltip title={sponsorName}>
 									<span className='sponsorName'>
-										{sponsorName}
+										{abbreviation}
 									</span>
-								</>}
-								<span>is sponsoring this {hNFT}. </span>
+								</Tooltip>
 							</>}
-							{ad.type === AD_DATA_TYPE.CLOCK_IN && <>
-								<span>{ad?.assetName} NFT Power </span>
+							{!abbreviation && <>
+								<span className='sponsorName'>
+									{sponsorName}
+								</span>
 							</>}
+							<span>is sponsoring this {hNFT}. </span>
 							<a className='bidLink' href={`${config.paramiWallet}/bid/${ad.nftId}`} target="_blank">Bid on this ad space</a>
 						</span>
 					</div>
@@ -290,30 +307,19 @@ const Advertisement: React.FC<{
 																},
 															});
 														}}>
-															{ad.type === AD_DATA_TYPE.CLOCK_IN && 'Share'}
-															{ad.type === AD_DATA_TYPE.AD && 'Share & Earn more'}
+															Share & Earn more
 														</div>
 													</>}
 
 													{!claimed && <>
-														<>
-															{ad.type === AD_DATA_TYPE.CLOCK_IN && <>
-																<div className='actionBtn left right' onClick={() => {
-																	clickAction();
-																	claim(false);
-																}}>Claim</div>
-															</>}
-															{ad.type === AD_DATA_TYPE.AD && <>
-																<div className='actionBtn left' onClick={() => {
-																	clickAction();
-																	claim(false);
-																}}>Claim</div>
-																<div className='actionBtn right' onClick={() => {
-																	clickAction();
-																	claim(true);
-																}}>Claim & Learn more</div>
-															</>}
-														</>
+														<div className='actionBtn left' onClick={() => {
+															clickAction();
+															claim(false);
+														}}>Claim</div>
+														<div className='actionBtn right' onClick={() => {
+															clickAction();
+															claim(true);
+														}}>Claim & Learn more</div>
 													</>}
 												</>}
 											</div>

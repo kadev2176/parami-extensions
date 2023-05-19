@@ -125,7 +125,7 @@ function AdIcon({ href, ad, avatarSrc, largeIcon }: AdIconProps) {
             <Popover content={content} placement="rightTop" className='ad-popover' trigger={trigger} onOpenChange={handlePopoverOpen} open={open}>
                 <span className={`pfp-link-badge ${!!adData?.type ? 'ad-icon' : 'default-icon'} ${largeIcon ? 'large-icon' : ''}`}>
                     {!!adData?.type && <span className='img-container'>
-                        <img referrerPolicy='no-referrer' src={adData?.icon ?? defaultAdIcon}></img>
+                        <img referrerPolicy='no-referrer' src={adData?.icon || defaultAdIcon}></img>
                     </span>}
                     {!adData?.type && <>
                         <i className="fa-solid fa-heart"></i>
